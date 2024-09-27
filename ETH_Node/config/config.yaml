@@ -1,0 +1,75 @@
+!Config
+app:
+  monitor_refresh_time: 1
+  monitor_observation: 60
+  downloader_count:  8
+  inserter_count:  0
+  lock_timeout: 5
+  config_dump: true
+  cache_bucket: eth-cache
+
+redis:
+  host: redis
+  port: 5030
+  db: 1
+
+node:
+  endpoint: ?????
+
+minio:
+  endpoint: mimo
+  access_key: ?????
+  secret_key: ?????
+  secure: false
+
+mode:
+  read_cache: true
+  save_cache: true
+  insert_db: false
+
+db:
+  host: db
+  drivername: postgresql+psycopg2
+  username: ?????
+  password: ?????
+  port: 5480
+  database: eth
+
+id_producer:
+  max_queue_size: 500
+  sleep_time: 2
+  sleep_log: false
+
+block_downloader:
+  max_queue_size: 300
+  sleep_time: 2
+  sleep_log: false
+  remove_elements:
+    - logsBloom
+    - mixHash
+    - receiptsRoot
+    - sha3Uncles
+    - stateRoot
+    - transactionsRoot
+    - transactions.blockHash
+    - transactions.v
+    - transactions.r
+    - transactions.s
+    - transactions.chainId
+    - transactions.receipt.blockHash
+    - transactions.receipt.logsBloom
+    - transactions.receipt.root
+    - transactions.receipt.transactionHash
+    - transactions.receipt.transactionIndex
+    - transactions.receipt.type
+    - uncles.logsBloom
+    - uncles.mixHash
+    - uncles.receiptsRoot
+    - uncles.sha3Uncles
+    - uncles.stateRoot
+    - uncles.transactionsRoot
+
+
+block_inserter:
+  sleep_time: 1
+  sleep_log: false
