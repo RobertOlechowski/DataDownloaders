@@ -1,4 +1,6 @@
+import os
 import pickle
+import signal
 
 from source_code.Steps.AssetsStep import AssetsStep
 from source_code.Steps.StepBuilderStep import StepBuilderStep
@@ -54,8 +56,14 @@ if __name__ == '__main__':
     redis.rpush("tasks", *[pickle.dumps(a) for a in _steps])
 
     workers = WorkersCollection()
-
     workers.add(Worker, 1)
+
+    def stop_app():
+        print(f"Parent process (PID: {os.getpid()}) received SIGTERM. Waiting for workers to finish...")
+        workers.stop()
+
+    signal.signal(signal.SIGTERM, lambda a, b : stop_app())
+    signal.signal(signal.SIGINT, lambda a, b: stop_app())
 
     workers.start()
     workers.monitor(cb=monitor.monitor_cb, sleep_time=config.app.monitor_refresh_time)

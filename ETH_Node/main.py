@@ -1,3 +1,6 @@
+import os
+import signal
+
 from source_code.DAO.BaseDAO import BaseDAO
 from source_code.workers.BaseWorker import bucket_name
 
@@ -12,12 +15,12 @@ if __name__ == '__main__':
     from source_code.workers.BlockDownloader import BlockDownloader
     from source_code.workers.BlockInserter import BlockInserter
 
-
     config_loader = ConfigLoader()
     config = config_loader.get_data()
     redis = config.get_redis()
     minio = config.get_minio()
     monitor = MonitorWorker(config)
+
 
     print("Init")
     monitor.init()
@@ -38,6 +41,13 @@ if __name__ == '__main__':
     workers.add(IdProducer, 1)
     workers.add(BlockDownloader, config.app.downloader_count)
     workers.add(BlockInserter, config.app.inserter_count)
+
+    def stop_app():
+        print(f"Parent process (PID: {os.getpid()}) received SIGTERM. Waiting for workers to finish...")
+        workers.stop()
+
+    signal.signal(signal.SIGTERM, lambda a, b : stop_app())
+    signal.signal(signal.SIGINT, lambda a, b: stop_app())
 
     workers.start()
     workers.monitor(cb=monitor.monitor_cb, sleep_time=config.app.monitor_refresh_time)

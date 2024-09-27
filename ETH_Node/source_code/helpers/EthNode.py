@@ -32,8 +32,7 @@ def _make_request_impl(config, method, params):
     payload = dict(method=method, params=params, jsonrpc="2.0", id=counter)
 
     response = _session.post(config.node.endpoint, data=json.dumps(payload), headers=headers, auth=None, timeout=15)
-    if response.status_code != 200:
-        raise Exception(f"Response code is {response.status_code}")
+    response.raise_for_status()
 
     response_json = response.json()
     if response_json["id"] != counter:
