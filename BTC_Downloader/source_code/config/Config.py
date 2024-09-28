@@ -19,7 +19,7 @@ def getattr_ex(_obj, name):
         return _obj
 
 
-def setattr_ex(_obj, name, value):
+def setattr_ex(_obj, name, value, parent_class=object):
     if isinstance(name, str):
         name = name.split(".")
 
@@ -27,7 +27,7 @@ def setattr_ex(_obj, name, value):
         for item in name[:-1]:
             _next = getattr(_obj, item, None)
             if _next is None:
-                _next = DictObj({})
+                _next = parent_class()
                 setattr(_obj, item, _next)
             _obj = _next
 
@@ -62,14 +62,14 @@ class Config(DumpBase):
                 continue
 
             if _old_value is not None and isinstance(_old_value, int):
-                setattr_ex(self, key, int(value))
+                setattr_ex(self, key, int(value), parent_class=DictObj)
                 continue
 
             if _old_value is not None and isinstance(_old_value, float):
-                setattr_ex(self, key, float(value))
+                setattr_ex(self, key, float(value), parent_class=DictObj)
                 continue
 
-            setattr_ex(self, key, value)
+            setattr_ex(self, key, value, parent_class=DictObj)
 
 
     def get_redis(self):

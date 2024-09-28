@@ -13,7 +13,7 @@ LABEL version=$BUILD_VERSION
 LABEL license="Apache License 2.0"
 
 LABEL org.opencontainers.image.title="ETH to DB"
-LABEL org.opencontainers.image.description="Tool to collect data from ETH node and insert it to DB"
+LABEL org.opencontainers.image.description="Tool to collect data from ETH node and insert it to object storage"
 LABEL org.opencontainers.image.authors="Robert Olechowski <robertolechowski@gmail.com>"
 LABEL org.opencontainers.image.version=$BUILD_VERSION
 LABEL org.opencontainers.image.source="https://github.com/RobertOlechowski/DataDownloaders"

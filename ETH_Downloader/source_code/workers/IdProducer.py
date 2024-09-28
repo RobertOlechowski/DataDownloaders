@@ -1,6 +1,3 @@
-from sqlalchemy.orm import sessionmaker
-
-from source_code.DAO.EthBlockDAO import EthBlockDAO
 from source_code.helpers.EthNode import EthNode
 from source_code.workers.BaseWorker import BaseWorker, get_block_object_name, bucket_name
 
@@ -23,19 +20,12 @@ class IdProducer(BaseWorker):
 
         self.redis = self.config.get_redis()
         self.node = EthNode(self.config)
-        self.engine = self.config.get_db_engine()
         self.minio = self.config.get_minio()
-        self.session = sessionmaker(bind=self.engine)()
 
         self._start_range = None
 
     def get_top_block_height(self):
         _test_range = 200
-
-        if self.config.mode.insert_db:
-            top_heights = self.session.query(EthBlockDAO.id).order_by(EthBlockDAO.id.desc()).limit(_test_range).all()
-            _ids_in_db = set([a[0] for a in top_heights])
-            return _ids_in_db
 
         def is_present(numer) -> bool:
             object_name = get_block_object_name(numer)

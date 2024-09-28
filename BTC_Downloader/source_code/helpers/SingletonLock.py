@@ -10,7 +10,6 @@ class SingletonLock:
         if is_locked:
             self.lock_acquired = True
             return
-
         raise RuntimeError("Another instance is already running.")
 
     def refresh_lock(self):
@@ -21,4 +20,4 @@ class SingletonLock:
         if self.lock_acquired:
             self.redis.delete(self.lock_key)
             self.lock_acquired = False
-            print("Lock released.")
+

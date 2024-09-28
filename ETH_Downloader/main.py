@@ -1,7 +1,6 @@
 import os
 import signal
 
-from source_code.DAO.BaseDAO import BaseDAO
 from source_code.workers.BaseWorker import bucket_name
 
 if __name__ == '__main__':
@@ -13,7 +12,6 @@ if __name__ == '__main__':
     from source_code.helpers.WorkersCollection import WorkersCollection
     from source_code.workers.IdProducer import IdProducer
     from source_code.workers.BlockDownloader import BlockDownloader
-    from source_code.workers.BlockInserter import BlockInserter
 
     config_loader = ConfigLoader()
     config = config_loader.get_data()
@@ -33,14 +31,9 @@ if __name__ == '__main__':
     if minio is not None:
         minio.create_bucket(bucket_name)
 
-    engine = config.get_db_engine()
-    if engine is not None:
-        BaseDAO.metadata.create_all(engine)
-
     workers = WorkersCollection()
     workers.add(IdProducer, 1)
     workers.add(BlockDownloader, config.app.downloader_count)
-    workers.add(BlockInserter, config.app.inserter_count)
 
     def stop_app():
         print(f"Parent process (PID: {os.getpid()}) received SIGTERM. Waiting for workers to finish...")
@@ -54,4 +47,5 @@ if __name__ == '__main__':
     workers.join()
 
     monitor.app_lock.release_lock()
+    print("Lock released.")
 

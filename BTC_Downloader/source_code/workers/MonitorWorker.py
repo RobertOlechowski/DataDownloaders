@@ -14,6 +14,7 @@ class MonitorWorker(object):
         self.redis = self.config.get_redis()
         self.app_lock = SingletonLock(self.redis, config.app.lock_timeout)
         self.node = BtcNode(self.config)
+        self.max_block_height = None
 
     def init(self):
         self.app_lock.acquire_lock()
@@ -48,24 +49,24 @@ class MonitorWorker(object):
 
         _lq1 = self.redis.llen("block_ids")
         _w2 = config.app.downloader_count
-        _w3 = config.app.inserter_count
 
         _lq_log = len(all_elements)
 
-        q_len_text = f"[{_lq1:>4}] worker: [{_w2:>2} |{_w3:>2}]   log: [{_lq_log:>4}]"
+        q_len_text = f"[{_lq1:>4}] worker: [{_w2:>2}]   log: [{_lq_log:>4}]"
 
         progress_text = "???"
-        last_block_height = None
 
         latest_block_number = self.node.get_latest_block_number()
-        if len(all_elements) > 0:
-            last_block_height = max([a.height for a in all_elements])
-            progress = 100.0 * last_block_height / latest_block_number
-            blocks_left = latest_block_number - last_block_height
-            last_block_height_text = f"{last_block_height:>8,}".replace(',', " ")
-            blocks_left_text = f"{blocks_left:>8,}".replace(',', " ")
 
-            progress_text = f"height: {last_block_height_text}  left: {blocks_left_text}  progress: {progress:>5.2f}%"
+        if len(all_elements) > 0:
+            self.max_block_height = max(self.max_block_height or -1, max([a.height for a in all_elements]))
+
+        if self.max_block_height is not None:
+            progress = 100.0 * self.max_block_height / latest_block_number
+            blocks_left = latest_block_number - self.max_block_height
+            last_block_height_text = f"{self.max_block_height:>8,}".replace(',', " ")
+            blocks_left_text = f"{blocks_left:>8,}".replace(',', " ")
+            progress_text = f"max_downloaded: {last_block_height_text}  left: {blocks_left_text}  progress: {progress:>5.2f}%"
 
         print(f"===\t{q_len_text}\t|\t {progress_text}", flush=True)
 
@@ -75,7 +76,7 @@ class MonitorWorker(object):
             progress_per_hour = (blocs_per_hour / latest_block_number) * 100.0
             blocs_per_min = blocs_per_hour / 60.0
 
-            to_process_count = latest_block_number - last_block_height
+            to_process_count = latest_block_number - self.max_block_height
             eta = (to_process_count / blocs_per_hour) / 24.0
 
             _speed_text = f"speed: {blocs_per_min:>4.0f} b/min   {progress_per_hour:>4.2f} %/h  eta: {eta:3.1f} days"

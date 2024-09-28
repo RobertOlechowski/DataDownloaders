@@ -3,7 +3,6 @@ app:
   monitor_refresh_time: 1
   monitor_observation: 60
   downloader_count:  8
-  inserter_count:  0
   lock_timeout: 5
   config_dump: true
   cache_bucket: eth-cache
@@ -21,19 +20,6 @@ minio:
   access_key: ?????
   secret_key: ?????
   secure: false
-
-mode:
-  read_cache: true
-  save_cache: true
-  insert_db: false
-
-db:
-  host: db
-  drivername: postgresql+psycopg2
-  username: ?????
-  password: ?????
-  port: 5480
-  database: eth
 
 id_producer:
   max_queue_size: 500
@@ -68,8 +54,3 @@ block_downloader:
     - uncles.sha3Uncles
     - uncles.stateRoot
     - uncles.transactionsRoot
-
-
-block_inserter:
-  sleep_time: 1
-  sleep_log: false

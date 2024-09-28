@@ -45,4 +45,5 @@ if __name__ == '__main__':
     workers.join()
 
     monitor.app_lock.release_lock()
+    print("Lock released.")
 

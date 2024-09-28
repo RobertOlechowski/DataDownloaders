@@ -63,7 +63,7 @@ class IdProducer(BaseWorker):
 
         _max_id = self.node.get_latest_block_number()
         _end_range = min(self._start_range + batch_size, _max_id)
-        elements = list(range(self._start_range, _end_range))
+        elements = list(range(self._start_range, _end_range+1))
 
         if queue_size >= (0.8 * max_queue_size) or len(elements) == 0:
             self._wait_sleep()

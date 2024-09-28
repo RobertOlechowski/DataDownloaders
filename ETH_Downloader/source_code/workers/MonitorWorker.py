@@ -47,12 +47,10 @@ class MonitorWorker(object):
         all_elements = [pickle.loads(a) for a in self.redis.lrange("log", 0, -1)]
 
         _lq1 = self.redis.llen("block_ids")
-        _lq2 = self.redis.llen("block_data") if config.mode.insert_db else "N/A"
         _lq_log = len(all_elements)
         _w2 = config.app.downloader_count
-        _w3 = config.app.inserter_count
 
-        q_len_text = f"[{_lq1:>4}] ==> [{_lq2:>4}] worker: [{_w2:>2} |{_w3:>2}]   log: [{_lq_log:>4}]"
+        q_len_text = f"[{_lq1:>4}] worker: [{_w2:>2}]   log: [{_lq_log:>4}]"
 
         progress_text = "???"
         last_block_height = None

@@ -3,7 +3,6 @@ app:
   monitor_refresh_time: 1
   monitor_observation: 60
   downloader_count:  3
-  inserter_count:  6
   lock_timeout: 5
   config_dump: true
   sleep_time: 1
@@ -32,4 +31,4 @@ id_producer:
 block_downloader:
   delay_start: 1.5
   max_queue_size: 300
-  sleep_log: true
+  sleep_log: false

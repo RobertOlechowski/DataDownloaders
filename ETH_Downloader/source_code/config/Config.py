@@ -1,7 +1,6 @@
 import os
 
 import yaml
-from sqlalchemy import create_engine, URL
 
 from source_code.helpers.DictObj import DictObj
 from source_code.helpers.DumpBase import DumpBase
@@ -49,7 +48,6 @@ yaml.add_constructor('!Config', _config_constructor)
 
 class Config(DumpBase):
     def __init__(self, **kwargs):
-        self.db_engine = None
         self.minio_wrapper = None
 
         for k in kwargs.keys():
@@ -74,31 +72,16 @@ class Config(DumpBase):
 
             setattr_ex(self, key, value)
 
-        if not self.mode.insert_db:
-            self.app.inserter_count = 0
 
     def get_redis(self):
         import redis
         return redis.Redis(**self.redis.__dict__)
 
     def get_minio(self):
-        if not self.mode.read_cache and not self.mode.write_cache:
-            return None
-
         if self.minio_wrapper is None:
             from minio import Minio
             self.minio_wrapper = MinioWrapper(Minio(**self.minio.__dict__))
         return self.minio_wrapper
-
-    def get_db_engine(self):
-        if not self.mode.insert_db:
-            return None
-
-        if self.db_engine is not None:
-            return self.db_engine
-        database_url = URL.create(**self.db.__dict__)
-        self.db_engine = create_engine(database_url)
-        return self.db_engine
 
     def dump_config(self):
         print()

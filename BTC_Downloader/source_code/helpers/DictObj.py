@@ -23,22 +23,6 @@ class DictObj(DumpBase):
                 continue
             setattr(self, a, DictObj(b) if isinstance(b, dict) else b)
 
-    def get(self, name, default=None):
-        return getattr(self, name, default)
-
-    def get_path(self, name, default=None):
-        path = name.split(".")
-        _obj = self
-        for item in path:
-            _obj = getattr(_obj, item, None)
-            if _obj is None:
-                _obj = default
-                break
-        return _obj
-
-    def get_not_none(self, name, default=None):
-        return self.get(name, default) or default
-
     def keys(self):
         return self.__dict__.keys()
 
