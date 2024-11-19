@@ -4,9 +4,9 @@ import multiprocessing
 
 from source_code.config.Config import ConfigLoader
 from source_code.workers.MonitorWorker import MonitorWorker
-from source_code.helpers.WorkersCollection import WorkersCollection
 from source_code.workers.IdProducer import IdProducer
 from source_code.workers.BlockDownloader import BlockDownloader
+from ROTools.Helpers.WorkersCollection import WorkersCollection
 
 if __name__ == '__main__':
     multiprocessing.set_start_method('spawn')
