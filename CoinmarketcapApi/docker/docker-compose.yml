@@ -1,5 +1,0 @@
-services:
-  BtcToDb:
-    image: registry.home.robertolechowski.com/btc-to-db:latest
-    container_name: btc-to-db
-    restart: unless-stopped
