@@ -41,7 +41,7 @@ if __name__ == '__main__':
     signal.signal(signal.SIGINT, lambda a, b: stop_app())
 
     workers.start()
-    workers.monitor(cb=monitor.monitor_cb, config=config)
+    workers.monitor(cb=monitor.monitor_cb, sleep_time=config.app.monitor_refresh_time)
     workers.join()
 
     monitor.app_lock.release_lock()

@@ -1,6 +1,7 @@
 import pickle
 
-from source_code.helpers.DictObj import DictObj
+from ROTools.Helpers.DictObj import DictObj
+
 from source_code.helpers.EthNode import EthNode
 from source_code.helpers.ProgresLog import ProgresLog
 from source_code.workers.BaseWorker import BaseWorker, get_block_object_name
