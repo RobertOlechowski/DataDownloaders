@@ -20,7 +20,6 @@ yaml.add_constructor('!Config', _config_constructor)
 
 class Config(DumpBase):
     def __init__(self, **kwargs):
-        self.db_engine = None
         self.mimo_wrapper = None
 
         for k in kwargs.keys():
