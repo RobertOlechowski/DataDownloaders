@@ -4,7 +4,6 @@ import traceback
 
 from source_code.config.Config import ConfigLoader
 
-bucket_name = "btc-cache"
 
 
 def get_block_object_name(height):

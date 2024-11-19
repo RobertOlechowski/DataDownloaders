@@ -3,7 +3,7 @@ import pickle
 from source_code.helpers.DictObj import DictObj
 from source_code.helpers.EthNode import EthNode
 from source_code.helpers.ProgresLog import ProgresLog
-from source_code.workers.BaseWorker import BaseWorker, bucket_name, get_block_object_name
+from source_code.workers.BaseWorker import BaseWorker, get_block_object_name
 
 def _remove_from_dictionary(key_path, obj):
     k = key_path.pop(0)
@@ -53,7 +53,7 @@ class BlockDownloader(BaseWorker):
         for item in self.local_config.remove_elements:
             remove_from_dictionary(item, json_block)
 
-        self.minio.put_json(bucket_name, object_name, json_block)
+        self.minio.put_json(self.config.app.cache_bucket, object_name, json_block)
 
         return DictObj(json_block)
 

@@ -4,7 +4,7 @@ import time
 from source_code.helpers.BtcNode import BtcNode
 from source_code.helpers.DictObj import DictObj
 from source_code.helpers.ProgresLog import ProgresLog
-from source_code.workers.BaseWorker import BaseWorker, bucket_name, get_block_object_name
+from source_code.workers.BaseWorker import BaseWorker, get_block_object_name
 
 
 class BlockDownloader(BaseWorker):
@@ -26,7 +26,7 @@ class BlockDownloader(BaseWorker):
         if _block.height != block_height:
             raise Exception("Invalid block height")
 
-        self.minio.put_json(bucket_name, object_name, json_block)
+        self.minio.put_json(self.config.app.cache_bucket, object_name, json_block)
 
         return _block
 

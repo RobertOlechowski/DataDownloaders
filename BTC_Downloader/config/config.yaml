@@ -6,6 +6,7 @@ app:
   lock_timeout: 5
   config_dump: true
   sleep_time: 1
+  cache_bucket: btc
 
 redis:
   host: redis

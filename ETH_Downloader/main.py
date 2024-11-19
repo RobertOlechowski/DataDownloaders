@@ -1,8 +1,6 @@
 import os
 import signal
 
-from source_code.workers.BaseWorker import bucket_name
-
 if __name__ == '__main__':
     import multiprocessing
     multiprocessing.set_start_method('spawn')
@@ -29,7 +27,7 @@ if __name__ == '__main__':
         redis.delete(item)
 
     if minio is not None:
-        minio.create_bucket(bucket_name)
+        minio.create_bucket(config.app.cache_bucket)
 
     workers = WorkersCollection()
     workers.add(IdProducer, 1)

@@ -5,7 +5,7 @@ app:
   downloader_count:  8
   lock_timeout: 5
   config_dump: true
-  cache_bucket: eth-cache
+  cache_bucket: eth
 
 redis:
   host: redis
@@ -31,26 +31,26 @@ block_downloader:
   sleep_time: 2
   sleep_log: false
   remove_elements:
-    - logsBloom
-    - mixHash
-    - receiptsRoot
-    - sha3Uncles
-    - stateRoot
-    - transactionsRoot
-    - transactions.blockHash
-    - transactions.v
-    - transactions.r
-    - transactions.s
-    - transactions.chainId
     - transactions.receipt.blockHash
-    - transactions.receipt.logsBloom
-    - transactions.receipt.root
     - transactions.receipt.transactionHash
-    - transactions.receipt.transactionIndex
-    - transactions.receipt.type
-    - uncles.logsBloom
-    - uncles.mixHash
-    - uncles.receiptsRoot
-    - uncles.sha3Uncles
-    - uncles.stateRoot
-    - uncles.transactionsRoot
+    #- logsBloom
+    #- mixHash
+    #- receiptsRoot
+    #- sha3Uncles
+    #- stateRoot
+    #- transactionsRoot
+    #- transactions.blockHash
+    #- transactions.v
+    #- transactions.r
+    #- transactions.s
+    #- transactions.chainId
+    #- transactions.receipt.logsBloom
+    #- transactions.receipt.root
+    #- transactions.receipt.transactionIndex
+    #- transactions.receipt.type
+    #- uncles.logsBloom
+    #- uncles.mixHash
+    #- uncles.receiptsRoot
+    #- uncles.sha3Uncles
+    #- uncles.stateRoot
+    #- uncles.transactionsRoot

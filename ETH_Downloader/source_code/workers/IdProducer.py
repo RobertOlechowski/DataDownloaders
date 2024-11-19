@@ -1,5 +1,5 @@
 from source_code.helpers.EthNode import EthNode
-from source_code.workers.BaseWorker import BaseWorker, get_block_object_name, bucket_name
+from source_code.workers.BaseWorker import BaseWorker, get_block_object_name
 
 
 def _find_highest(cb) -> int:
@@ -29,7 +29,7 @@ class IdProducer(BaseWorker):
 
         def is_present(numer) -> bool:
             object_name = get_block_object_name(numer)
-            return self.minio.object_exists(bucket_name, object_name)
+            return self.minio.object_exists(self.config.app.cache_bucket, object_name)
 
         _highest = _find_highest(is_present)
         _min_range = max(0, _highest - _test_range)

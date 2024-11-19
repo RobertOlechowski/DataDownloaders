@@ -4,10 +4,6 @@ import traceback
 
 from source_code.config.Config import ConfigLoader
 
-bucket_name = "eth-cache"
-
-
-
 def get_block_object_name(height):
     number_text = f"{height:010d}"
     s1 = number_text[:6]

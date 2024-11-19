@@ -27,7 +27,7 @@ if __name__ == '__main__':
 
     minio = config.get_minio()
     if minio is not None:
-        minio.create_bucket("btc-cache")
+        minio.create_bucket(config.app.cache_bucket)
 
     workers = WorkersCollection()
     workers.add(IdProducer, 1, start=True)
