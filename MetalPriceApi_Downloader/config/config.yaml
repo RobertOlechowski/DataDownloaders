@@ -7,20 +7,10 @@ app:
   config_dump: true
   sleep_time: 1
 
-mode:
-  read_cache: true
-  save_cache: true
-  insert_db: true
-
 redis:
-  host: redis
+  host: ?????
   port: 5030
   db: ?????
-
-node:
-  endpoint: ?????
-  user: ?????
-  password: ?????
 
 minio:
   endpoint: mimo

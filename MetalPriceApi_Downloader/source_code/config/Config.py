@@ -1,38 +1,10 @@
 import os
 
 import yaml
-
-from source_code.helpers.DictObj import DictObj
-from source_code.helpers.DumpBase import DumpBase
-from source_code.helpers.MinioWrapper import MinioWrapper
-
-
-def getattr_ex(_obj, name):
-    if isinstance(name, str):
-        name = name.split(".")
-
-    if isinstance(name, list):
-        for item in name:
-            if _obj is None:
-                return None
-            _obj = getattr(_obj, item, None)
-
-        return _obj
-
-
-def setattr_ex(_obj, name, value):
-    if isinstance(name, str):
-        name = name.split(".")
-
-    if isinstance(name, list):
-        for item in name[:-1]:
-            _next = getattr(_obj, item, None)
-            if _next is None:
-                _next = DictObj({})
-                setattr(_obj, item, _next)
-            _obj = _next
-
-        setattr(_obj, name[-1], value)
+from ROTools.Helpers.Attr import setattr_ex, getattr_ex
+from ROTools.Helpers.DictObj import DictObj
+from ROTools.Helpers.DumpBase import DumpBase
+from ROTools.Wrappers.MinioWrapper import MinioWrapper
 
 
 def _config_constructor(loader, node):
@@ -73,9 +45,6 @@ class Config(DumpBase):
 
             setattr_ex(self, key, value)
 
-        if not self.mode.insert_db:
-            self.app.inserter_count = 0
-
     def get_redis(self):
         import redis
         return redis.Redis(**self.redis.__dict__)
@@ -85,15 +54,6 @@ class Config(DumpBase):
             from minio import Minio
             self.mimo_wrapper = MinioWrapper(Minio(**self.minio.__dict__))
         return self.mimo_wrapper
-
-    def get_db_engine(self):
-        if not self.mode.insert_db:
-            return None
-        if self.db_engine is not None:
-            return self.db_engine
-        database_url = URL.create(**self.db.__dict__)
-        self.db_engine = create_engine(database_url)
-        return self.db_engine
 
     def dump_config(self):
         print()

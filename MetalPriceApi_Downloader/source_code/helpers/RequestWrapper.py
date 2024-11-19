@@ -2,10 +2,8 @@ import sys
 import threading
 import time
 import traceback
-
 import requests
-
-from source_code.helpers.DictObj import DictObj
+from ROTools.Helpers.DictObj import DictObj
 
 _local_sessions = threading.local()
 

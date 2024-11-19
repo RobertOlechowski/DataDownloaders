@@ -1,4 +1,4 @@
-
+from ROTools.Helpers.WorkersCollection import WorkersCollection
 
 if __name__ == '__main__':
     import pickle
@@ -7,7 +7,6 @@ if __name__ == '__main__':
 
     from source_code.config.Config import ConfigLoader
     from source_code.workers.MonitorWorker import MonitorWorker
-    from source_code.helpers.WorkersCollection import WorkersCollection
     from source_code.helpers.RequestWrapper import RequestWrapper
 
     config_loader = ConfigLoader()
