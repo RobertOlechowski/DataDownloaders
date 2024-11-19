@@ -25,7 +25,7 @@ echo
 echo
 echo '=== BUILD ==='
 echo
-pip freeze > ../requirements.txt
+
 docker build -f ../docker/Dockerfile --build-arg BUILD_VERSION=${version}  --build-arg BUILD_TIME=${build_time}  -t $image_name:dev ../.
 echo
 
