@@ -1,8 +1,9 @@
 from datetime import datetime, timezone
 
+from ROTools.Helpers.DictObj import DictObj
+
 from source_code.Steps.BaseStep import BaseStep
 from source_code.Steps.ExchangeStep import ExchangeStep
-from source_code.helpers.DictObj import DictObj
 
 
 def _get_object_name(name):

@@ -1,11 +1,10 @@
 import os
 
 import yaml
-
-from source_code.helpers.DictObj import DictObj
-from source_code.helpers.DumpBase import DumpBase
-from source_code.helpers.MinioWrapper import MinioWrapper
-from source_code.helpers.other import getattr_ex, setattr_ex
+from ROTools.Helpers.Attr import getattr_ex, setattr_ex
+from ROTools.Helpers.DictObj import DictObj
+from ROTools.Helpers.DumpBase import DumpBase
+from ROTools.Wrappers.MinioWrapper import MinioWrapper
 
 
 def _config_constructor(loader, node):

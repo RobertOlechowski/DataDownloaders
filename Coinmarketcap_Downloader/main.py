@@ -2,10 +2,11 @@ import os
 import pickle
 import signal
 
+from ROTools.Helpers.WorkersCollection import WorkersCollection
+
 from source_code.Steps.AssetsStep import AssetsStep
 from source_code.Steps.StepBuilderStep import StepBuilderStep
 from source_code.Steps.ExchangeStep import ExchangeStep
-from source_code.Steps.OHLCVStep import OHLCVStep
 from source_code.Steps.SymbolStep import SymbolStep
 from source_code.helpers.RequestWrapper import RequestWrapper
 
@@ -15,7 +16,6 @@ if __name__ == '__main__':
 
     from source_code.config.Config import ConfigLoader
     from source_code.workers.MonitorWorker import MonitorWorker
-    from source_code.helpers.WorkersCollection import WorkersCollection
     from source_code.workers.Worker import Worker
 
     config_loader = ConfigLoader()

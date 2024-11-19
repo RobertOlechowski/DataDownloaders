@@ -1,6 +1,7 @@
 import pickle
 
-from source_code.helpers.RateLimiter import RateLimiter
+from ROTools.Helpers.RateLimiter import RateLimiter
+
 from source_code.helpers.RequestWrapper import RequestWrapper
 from source_code.workers.BaseWorker import BaseWorker
 

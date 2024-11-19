@@ -3,33 +3,22 @@ import pickle
 from datetime import datetime, timezone
 
 import humanize
-
-from source_code.helpers.SingletonLock import SingletonLock
+from ROTools.Helpers.Info import print_info
+from ROTools.Helpers.RedisSingletonLock import RedisSingletonLock
 
 
 class MonitorWorker(object):
     def __init__(self, config):
         self.config = config
         self.redis = self.config.get_redis()
-        self.app_lock = SingletonLock(self.redis, config.app.lock_timeout)
+        self.app_lock = RedisSingletonLock(self.redis, config.app.lock_timeout)
         self.minio = self.config.get_minio()
 
         self.total_logs = 0
         self.log_dict = {}
 
     def init(self):
-        print()
-        build_ver = os.getenv("RR_BUILD_VERSION")
-        print(f"Build version    \t: {build_ver}")
-        build_time = os.getenv("RR_BUILD_TIME")
-        print(f"Build time UTC   \t: {build_time}")
-        print(f"Current time UTC \t: {datetime.now(timezone.utc)}")
-        if build_time is not None:
-            build_time = datetime.fromisoformat(build_time)
-            build_old = humanize.naturaltime(datetime.now(timezone.utc) - build_time)
-            print(f"Build old\t\t: {build_old}")
-        print()
-
+        print_info()
         self.app_lock.acquire_lock()
 
         if self.config.app.config_dump:

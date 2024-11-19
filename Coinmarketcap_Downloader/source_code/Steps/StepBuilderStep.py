@@ -1,9 +1,10 @@
 import pickle
 
+from ROTools.Helpers.DictObj import DictObj
+
 from source_code.Steps.BaseStep import BaseStep
 from source_code.Steps.OHLCVStep import OHLCVStep
 from source_code.Steps.SymbolStep import SymbolStep
-from source_code.helpers.DictObj import DictObj
 
 
 class StepBuilderStep(BaseStep):
