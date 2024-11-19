@@ -2,13 +2,10 @@ import json
 import sys
 import threading
 import time
-
 import requests
-
-from source_code.helpers.DictObj import DictObj
+from ROTools.Helpers.DictObj import DictObj
 
 _local_sessions = threading.local()
-
 
 def _get_session_data():
     if not hasattr(_local_sessions, "session"):

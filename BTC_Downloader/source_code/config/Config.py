@@ -1,37 +1,10 @@
 import os
 
 import yaml
-from source_code.helpers.DictObj import DictObj
-from source_code.helpers.DumpBase import DumpBase
-from source_code.helpers.MinioWrapper import MinioWrapper
-
-
-def getattr_ex(_obj, name):
-    if isinstance(name, str):
-        name = name.split(".")
-
-    if isinstance(name, list):
-        for item in name:
-            if _obj is None:
-                return None
-            _obj = getattr(_obj, item, None)
-
-        return _obj
-
-
-def setattr_ex(_obj, name, value, parent_class=object):
-    if isinstance(name, str):
-        name = name.split(".")
-
-    if isinstance(name, list):
-        for item in name[:-1]:
-            _next = getattr(_obj, item, None)
-            if _next is None:
-                _next = parent_class()
-                setattr(_obj, item, _next)
-            _obj = _next
-
-        setattr(_obj, name[-1], value)
+from ROTools.Helpers.Attr import getattr_ex, setattr_ex
+from ROTools.Helpers.DictObj import DictObj
+from ROTools.Helpers.DumpBase import DumpBase
+from ROTools.Wrappers.MinioWrapper import MinioWrapper
 
 
 def _config_constructor(loader, node):
@@ -43,7 +16,6 @@ def _config_constructor(loader, node):
 
 
 yaml.add_constructor('!Config', _config_constructor)
-
 
 class Config(DumpBase):
     def __init__(self, **kwargs):

@@ -1,35 +1,22 @@
-import os
 import pickle
-from datetime import datetime, timezone
 
-import humanize
-
+from ROTools.Helpers.Info import print_info
+from ROTools.Helpers.RedisSingletonLock import RedisSingletonLock
 from source_code.helpers.BtcNode import BtcNode
-from source_code.helpers.SingletonLock import SingletonLock
 
 
 class MonitorWorker(object):
     def __init__(self, config):
         self.config = config
         self.redis = self.config.get_redis()
-        self.app_lock = SingletonLock(self.redis, config.app.lock_timeout)
+        self.app_lock = RedisSingletonLock(self.redis, config.app.lock_timeout)
         self.node = BtcNode(self.config)
         self.max_block_height = None
 
     def init(self):
         self.app_lock.acquire_lock()
 
-        print()
-        build_ver = os.getenv("RR_BUILD_VERSION")
-        print(f"Build version    \t: {build_ver}")
-        build_time = os.getenv("RR_BUILD_TIME")
-        print(f"Build time UTC   \t: {build_time}")
-        print(f"Current time UTC \t: {datetime.now(timezone.utc)}")
-        if build_time is not None:
-            build_time = datetime.fromisoformat(build_time)
-            build_old = humanize.naturaltime(datetime.now(timezone.utc) - build_time)
-            print(f"Build old\t\t: {build_old}")
-        print()
+        print_info()
 
         if self.config.app.config_dump:
             self.config.dump_config()

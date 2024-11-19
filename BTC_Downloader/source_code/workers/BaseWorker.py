@@ -5,7 +5,6 @@ import traceback
 from source_code.config.Config import ConfigLoader
 
 
-
 def get_block_object_name(height):
     number_text = f"{height:08d}"
     s1 = number_text[:4]

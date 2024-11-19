@@ -1,8 +1,9 @@
 import pickle
 import time
 
+from ROTools.Helpers.DictObj import DictObj
+
 from source_code.helpers.BtcNode import BtcNode
-from source_code.helpers.DictObj import DictObj
 from source_code.helpers.ProgresLog import ProgresLog
 from source_code.workers.BaseWorker import BaseWorker, get_block_object_name
 
