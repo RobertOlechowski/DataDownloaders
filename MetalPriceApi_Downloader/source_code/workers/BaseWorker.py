@@ -1,14 +1,14 @@
 import sys
 import traceback
 
-from source_code.config.Config import ConfigLoader
+from ROTools.Config.ConfigLoader import build_config
 
 
 class BaseWorker:
     def __init__(self, stop_event, name, index):
         self.name = f"{name}-{index}"
         self.stop_event = stop_event
-        self.config = ConfigLoader().get_data()
+        self.config = build_config(file_name='config/config.yaml', skip_dump=True, prefix="METAL2DB_")
 
     @classmethod
     def start(cls, index, stop_event):

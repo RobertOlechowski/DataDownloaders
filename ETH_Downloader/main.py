@@ -18,7 +18,6 @@ if __name__ == '__main__':
     minio = config.get_minio()
     monitor = MonitorWorker(config)
 
-
     print("Init")
     monitor.init()
 

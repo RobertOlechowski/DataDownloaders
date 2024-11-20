@@ -5,17 +5,12 @@ from source_code.Msg.ProgresLog import ProgresLog
 
 class BaseStep:
     def __init__(self):
-        self.bucket_name = None
         self.init_done, self.is_done = False, False
         self.minio, self.request_wrapper, self.rate_limiter, self.redis = None, None, None, None
         self.config = None
-        self.bucket_name = "coinmarketcap"
 
     def init(self):
         self.init_done = True
-
-        if self.bucket_name is not None:
-            self.minio.create_bucket(self.bucket_name)
 
         if hasattr(self, 'init_impl'):
             self.init_impl()

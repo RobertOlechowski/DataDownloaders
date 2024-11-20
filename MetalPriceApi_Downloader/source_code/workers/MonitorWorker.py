@@ -1,4 +1,3 @@
-import os
 import pickle
 import humanize
 
@@ -20,12 +19,7 @@ class MonitorWorker(object):
         self.log_dict = {}
 
     def init(self):
-        print_info()
-
         self.app_lock.acquire_lock()
-
-        if self.config.app.config_dump:
-            self.config.dump_config()
 
         _queue_names = ["tasks", "log"]
         for item in _queue_names:

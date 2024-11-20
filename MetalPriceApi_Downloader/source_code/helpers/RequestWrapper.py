@@ -16,17 +16,15 @@ def _get_session():
     return session
 
 
-def _make_request_impl(config, request_data):
+def _make_request_impl(config, endpoint, params):
     headers = {'content-type': 'application/json',
                'Accept-Encoding': 'gzip, deflate',
                'Accept': '*/*',
                'Connection': 'keep-alive',
-               'X-CMC_PRO_API_KEY': config.coinmarketcap.api_key
                }
 
     _session = _get_session()
-
-    response = _session.get(url=request_data.endpoint, params=request_data.params, headers=headers)
+    response = _session.get(url=endpoint, params=params, headers=headers)
 
     if response.status_code != 200:
         msg = None
@@ -43,17 +41,15 @@ def _make_request_impl(config, request_data):
 
     json_data = response.json()
     response = DictObj(json_data)
+    if not response.success:
+        raise Exception(f"Success is FALSE")
 
-    if response.status.error_code != 0:
-        raise Exception(f"error_code is {response.status.error_code}")
+    return response
 
-    return json_data["data"]
-
-
-def _make_request(config, request_data):
+def _make_request(config, endpoint, params):
     for sleep_time in [1, 5, 60]:
         try:
-            return _make_request_impl(config, request_data)
+            return _make_request_impl(config, endpoint, params)
         except Exception as e:
             print(f"Error [{repr(e)}] and sleep for {sleep_time}", file=sys.stderr)
             traceback.print_exc()
@@ -64,6 +60,18 @@ def _make_request(config, request_data):
 class RequestWrapper:
     def __init__(self, config):
         self.config = config
+
+    def get_symbols(self):
+        endpoint = "https://api.metalpriceapi.com/v1/symbols"
+        params = {
+            'api_key': self.config.data_source.api_key,
+        }
+
+        _data = _make_request(self.config, endpoint, params)
+        keys = _data.symbols.__dict__.keys()
+        _data = [(a, getattr(_data.symbols, a)) for a in keys]
+        _data = [dict(symbol=a, name=b) for a, b in _data]
+        return _data
 
     def get_data(self, request_data):
         data = _make_request(self.config, request_data)

@@ -6,6 +6,9 @@ app:
   lock_timeout: 5
   config_dump: true
   sleep_time: 1
+  log_count: 3
+  log_count_extra: 5
+  bucket_name: metal-price
 
 redis:
   host: ?????
@@ -18,15 +21,9 @@ minio:
   secret_key: ?????
   secure: false
 
+data_source:
+  api_key: ae917ef791f48077d745b788d661f8bf
 
-id_producer:
-  max_queue_size: 300
-  sleep_log: false
-
-block_downloader:
-  delay_start: 1.5
-  max_queue_size: 300
-  sleep_log: true
-
-block_inserter:
-  sleep_log: false
+tasks:
+  symbols: true
+  price: true
