@@ -15,16 +15,11 @@ class BaseStep:
         if hasattr(self, 'init_impl'):
             self.init_impl()
 
-    def send_log(self, progress=None, progress_text=None, skip=None):
-        id_number = getattr(self, 'id_number', None)
-        interval = getattr(self, 'interval', None)
-
-        log = ProgresLog(name=self.main_name,
-                         sub_name=self.sub_name,
+    def send_log(self, name=None, sub_name="", is_done=False, progress_text=None, progress=0):
+        log = ProgresLog(name=name,
+                         sub_name=sub_name,
                          progress=progress,
                          progress_text=progress_text,
-                         is_done=self.is_done,
-                         skip=skip,
-                         id_number=id_number,
-                         interval=interval)
+                         is_done=is_done,
+                         skip=False)
         self.redis.rpush("log", pickle.dumps(log))

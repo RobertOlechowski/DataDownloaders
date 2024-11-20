@@ -2,28 +2,21 @@ import sys
 import threading
 import time
 import traceback
+from datetime import datetime
+
+import pytz
 import requests
 from ROTools.Helpers.DictObj import DictObj
+from ROTools.Helpers.RequestHelper import get_session_data, make_request_wrapper
 
-_local_sessions = threading.local()
-
-
-def _get_session():
-    if not hasattr(_local_sessions, "session"):
-        _local_sessions.session = (requests.Session(),)
-
-    session, = _local_sessions.session
-    return session
-
-
-def _make_request_impl(config, endpoint, params):
+def _make_request_impl(endpoint, method, params):
     headers = {'content-type': 'application/json',
                'Accept-Encoding': 'gzip, deflate',
                'Accept': '*/*',
                'Connection': 'keep-alive',
                }
 
-    _session = _get_session()
+    _session, _ = get_session_data()
     response = _session.get(url=endpoint, params=params, headers=headers)
 
     if response.status_code != 200:
@@ -43,18 +36,7 @@ def _make_request_impl(config, endpoint, params):
     response = DictObj(json_data)
     if not response.success:
         raise Exception(f"Success is FALSE")
-
     return response
-
-def _make_request(config, endpoint, params):
-    for sleep_time in [1, 5, 60]:
-        try:
-            return _make_request_impl(config, endpoint, params)
-        except Exception as e:
-            print(f"Error [{repr(e)}] and sleep for {sleep_time}", file=sys.stderr)
-            traceback.print_exc()
-            time.sleep(sleep_time)
-    raise e
 
 
 class RequestWrapper:
@@ -67,12 +49,27 @@ class RequestWrapper:
             'api_key': self.config.data_source.api_key,
         }
 
-        _data = _make_request(self.config, endpoint, params)
+        _data = make_request_wrapper(endpoint, None, params, _make_request_impl)
         keys = _data.symbols.__dict__.keys()
         _data = [(a, getattr(_data.symbols, a)) for a in keys]
         _data = [dict(symbol=a, name=b) for a, b in _data]
         return _data
 
-    def get_data(self, request_data):
-        data = _make_request(self.config, request_data)
-        return data
+    def get_data(self, tickers, query_time):
+
+        _query_time = query_time.strftime("%Y-%m-%d")
+
+        endpoint = f"https://api.metalpriceapi.com/v1/{_query_time}"
+        params = {
+            'api_key': self.config.data_source.api_key,
+            'base': "USD",
+            'currencies': ",".join(tickers)
+        }
+        tickers = set(tickers)
+        data = make_request_wrapper(endpoint, None, params, _make_request_impl)
+
+        rates = data.rates
+        rates = [(k, v) for k, v in rates.items() if k in tickers]
+        timestamp = datetime.fromtimestamp(data.timestamp, pytz.utc)
+
+        return dict(timestamp=timestamp, rates=rates)

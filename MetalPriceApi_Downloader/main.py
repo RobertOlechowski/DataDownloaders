@@ -2,7 +2,7 @@ from ROTools.Config.ConfigLoader import build_config
 from ROTools.Helpers.Info import print_info
 from ROTools.Helpers.WorkersCollection import WorkersCollection
 
-from source_code.Steps.SymbolStep import SymbolStep
+from source_code.Steps.PriceStep import PriceStep
 from source_code.workers.Worker import Worker
 
 if __name__ == '__main__':
@@ -24,24 +24,13 @@ if __name__ == '__main__':
 
     print("START")
 
-    if config.tasks.symbols:
-        redis.rpush("tasks", pickle.dumps(SymbolStep()))
-        workers = WorkersCollection()
-        workers.add(Worker, 1)
-        workers.start()
-        workers.monitor(cb=monitor.monitor_cb, sleep_time=config.app.monitor_refresh_time)
-        workers.join()
+    redis.rpush("tasks", pickle.dumps(PriceStep()))
+    workers = WorkersCollection()
+    workers.add(Worker, 1)
+    workers.start()
+    workers.monitor(cb=monitor.monitor_cb, sleep_time=config.app.monitor_refresh_time)
+    workers.join()
 
-
-    if config.tasks.price:
-        _steps.append(ExchangeStep(status="active"))
-
-
-    #workers = WorkersCollection()
-    #workers.add(Worker, config.app.downloader_count)
-    #workers.start()
-    #workers.monitor(cb=monitor.monitor_cb, sleep_time=config.app.monitor_refresh_time)
-    #workers.join()
 
     monitor.app_lock.release_lock()
 
