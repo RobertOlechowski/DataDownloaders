@@ -1,0 +1,27 @@
+!Config
+app:
+  monitor_refresh_time: 1
+  monitor_observation: 60
+  worker_count:  1
+  lock_timeout: 5
+  config_dump: true
+  sleep_time: 1
+  log_count: 5
+  log_count_extra: 7
+
+redis:
+  host: ?????
+  port: 5030
+  db: ?????
+
+minio:
+  endpoint: mimo
+  access_key: ?????
+  secret_key: ?????
+  secure: false
+
+metal_price_api:
+  bucket_name: metal-price
+  api_key: ????
+
+
