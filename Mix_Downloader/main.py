@@ -14,18 +14,18 @@ if __name__ == '__main__':
     from source_code.workers.MonitorWorker import MonitorWorker
 
     print_info()
-    config = load_config()
+    config = load_config(skip_dump=False)
     monitor = MonitorWorker(config)
     redis = config.get_redis()
 
-    config.get_minio().create_bucket(config.metal_price_api.bucket_name)
-
-    print("Init")
     monitor.init()
 
     print("START")
+    if config.metal_price_api.enable:
+        config.get_minio().create_bucket(config.metal_price_api.bucket_name)
+        redis.rpush("tasks", pickle.dumps(PriceStep))
 
-    redis.rpush("tasks", pickle.dumps(PriceStep))
+
     workers = WorkersCollection()
     workers.add(Worker, config.app.worker_count)
     workers.start()

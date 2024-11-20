@@ -2,7 +2,7 @@
 app:
   monitor_refresh_time: 1
   monitor_observation: 60
-  worker_count:  1
+  worker_count:  3
   lock_timeout: 5
   config_dump: true
   sleep_time: 1
@@ -21,6 +21,7 @@ minio:
   secure: false
 
 metal_price_api:
+  enable: True
   bucket_name: metal-price
   api_key: ????
 

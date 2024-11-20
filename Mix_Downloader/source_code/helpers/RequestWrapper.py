@@ -33,10 +33,10 @@ def _make_request_impl(endpoint, method, params):
         raise Exception(f"Error {msg}  url = {response.request.url}")
 
     json_data = response.json()
-    response = DictObj(json_data)
-    if not response.success:
+    response2 = DictObj(json_data)
+    if not response2.success:
         raise Exception(f"Success is FALSE")
-    return response
+    return response2
 
 
 class RequestWrapper:

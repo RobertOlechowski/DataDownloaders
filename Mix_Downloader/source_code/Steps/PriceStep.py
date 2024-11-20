@@ -9,6 +9,7 @@ class PriceStep(BaseStep):
         super().__init__(config)
 
         self.minio = config.get_minio()
+        self.redis = config.get_redis()
         self.request_wrapper = RequestWrapper(self.config.metal_price_api)
 
         self.bucket_name = self.config.metal_price_api.bucket_name
@@ -41,10 +42,12 @@ class PriceStep(BaseStep):
         self.send_log(name="Symbols", is_done=True, progress=len(self.tickers))
 
     def process(self):
-        #self.rate_limiter.call_wait()
-
         if self.query_time is None:
             self.query_time = self._get_last_date()
+
+        if (datetime.now(timezone.utc).date() - self.query_time).days < 3:
+            self.is_done = True
+            return
 
         if self.tickers is None:
             self._process_tickers()
@@ -58,12 +61,6 @@ class PriceStep(BaseStep):
         self.minio.put_json(self.bucket_name, object_name, data)
 
         self.send_log(name="Price", sub_name=time_text, is_done=True, progress=len(data["rates"]))
-
-        stop_date = datetime.now(timezone.utc).date()
-
-        if (stop_date - self.query_time).days < 3:
-            self.is_done = True
-            return
 
         self.query_time = self.query_time + timedelta(days=1)
 

@@ -1,8 +1,6 @@
 import pickle
 
-from source_code.helpers.RequestWrapper import RequestWrapper
 from source_code.workers.BaseWorker import BaseWorker
-
 
 class Worker(BaseWorker):
     def __init__(self, index, stop_event):
@@ -20,7 +18,6 @@ class Worker(BaseWorker):
                 return None
             step_task_class = pickle.loads(step_task_class)
             step_task = step_task_class(self.config)
-            step_task.redis = self.redis
             step_task.init()
             self.context = step_task
         return self.context

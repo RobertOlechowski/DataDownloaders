@@ -7,7 +7,6 @@ class BaseStep:
     def __init__(self, config):
         self.config = config
         self.init_done, self.is_done = False, False
-        self.minio, self.request_wrapper, self.rate_limiter, self.redis = None, None, None, None
 
     def init(self):
         self.init_done = True
