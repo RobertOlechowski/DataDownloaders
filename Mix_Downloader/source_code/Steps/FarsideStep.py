@@ -1,0 +1,35 @@
+from datetime import datetime, timezone, timedelta
+
+from source_code.RequestWrappers.FarsideRequestWrapper import FarsideRequestWrapper
+from source_code.Steps.BaseStep import BaseStep
+from source_code.RequestWrappers.MetalRequestWrapper import MetalRequestWrapper
+
+
+class FarsideStep(BaseStep):
+    def __init__(self, config, step_config):
+        super().__init__(config)
+
+        self.step_config = step_config
+        self.name = f"Farside {step_config.path}"
+        self.minio = config.get_minio()
+        self.redis = config.get_redis()
+
+        self.request_wrapper = FarsideRequestWrapper(self.step_config)
+        self.bucket_name = step_config.bucket_name
+
+    def process(self):
+        time = datetime.now(timezone.utc)
+        time_text = time.date().isoformat()
+        object_name = f"{time.year}/{self.step_config.path}_{time_text}.json"
+
+        if self.minio.object_exists(self.bucket_name, object_name):
+            self.send_log(phase="object exists skip", is_done=True)
+            self.is_done = True
+            return
+
+        data = self.request_wrapper.get_data()
+
+        self.minio.put_json(self.bucket_name, object_name, data)
+        self.is_done = True
+        self.send_log(phase="object added", is_done=True)
+

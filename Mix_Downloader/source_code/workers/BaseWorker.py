@@ -1,7 +1,6 @@
 import sys
+import time
 import traceback
-
-from ROTools.Config.ConfigLoader import build_config
 
 from source_code.helpers.config_builder import load_config
 
@@ -31,4 +30,4 @@ class BaseWorker:
             exit(1)
 
     def _wait_for_data(self):
-        self.stop_event.set()
+        time.sleep(self.config.app.no_data_sleep_time)

@@ -12,24 +12,24 @@ class Worker(BaseWorker):
         pass
 
     def _get_task(self):
-        if self.context is None:
-            step_task_class = self.redis.lpop("tasks")
-            if step_task_class is None:
-                return None
-            step_task_class = pickle.loads(step_task_class)
-            step_task = step_task_class(self.config)
-            step_task.init()
-            self.context = step_task
-        return self.context
+        if self.context is not None:
+            return self.context
+
+        task_raw = self.redis.lpop("tasks")
+        if task_raw is None:
+            return None
+        step_class, step_config = pickle.loads(task_raw)
+        step_task = step_class(self.config, step_config)
+        step_task.init()
+        return step_task
 
     def step(self):
-        step_task = self._get_task()
-        if step_task is None:
+        self.context = self._get_task()
+        if self.context is None:
             self._wait_for_data()
             return
 
-        if not step_task.is_done:
-            step_task.process()
+        if not self.context.is_done:
+            self.context.process()
 
-        if step_task.is_done:
-            self.context = None
+        self.context = None if self.context.is_done else self.context

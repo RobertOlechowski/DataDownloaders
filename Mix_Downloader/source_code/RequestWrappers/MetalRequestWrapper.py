@@ -9,7 +9,7 @@ import requests
 from ROTools.Helpers.DictObj import DictObj
 from ROTools.Helpers.RequestHelper import get_session_data, make_request_wrapper
 
-def _make_request_impl(endpoint, method, params):
+def _make_request_impl(endpoint, _, params):
     headers = {'content-type': 'application/json',
                'Accept-Encoding': 'gzip, deflate',
                'Accept': '*/*',
@@ -39,9 +39,9 @@ def _make_request_impl(endpoint, method, params):
     return response2
 
 
-class RequestWrapper:
-    def __init__(self, task_config):
-        self.task_config = task_config
+class MetalRequestWrapper:
+    def __init__(self, step_config):
+        self.task_config = step_config
 
     def get_symbols(self):
         endpoint = "https://api.metalpriceapi.com/v1/symbols"

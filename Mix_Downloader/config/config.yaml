@@ -5,7 +5,7 @@ app:
   worker_count:  3
   lock_timeout: 5
   config_dump: true
-  sleep_time: 1
+  no_data_sleep_time: 2
   log_count: 5
   log_count_extra: 7
 
@@ -21,8 +21,21 @@ minio:
   secure: false
 
 metal_price_api:
-  enable: True
+  enable: False
   bucket_name: metal-price
   api_key: ????
 
+farside_btc:
+  enable: True
+  bucket_name: farside
+  type: btc
+  path: btc
+  page: https://farside.co.uk/bitcoin-etf-flow-all-data/
+
+farside_eth:
+  enable: True
+  bucket_name: farside
+  type: eth
+  path: eth
+  page: https://farside.co.uk/ethereum-etf-flow-all-data/
 
