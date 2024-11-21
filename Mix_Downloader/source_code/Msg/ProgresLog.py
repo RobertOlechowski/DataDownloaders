@@ -8,14 +8,11 @@ class ProgresLog:
                  sub_name="",
                  progress=-1,
                  progress_text=None,
-                 skip=None,
-                 is_done=False):
+                 status=None):
         self.name = name
         self.sub_name = sub_name
-        self.status = "Done" if is_done else "Active"
-        self.is_done = is_done
+        self.status = status
         self.progress = progress
-        self.is_skip = skip
         self.progress_text = progress_text
         self.time = datetime.now(timezone.utc)
         self.tags = set([])
@@ -30,22 +27,15 @@ class ProgresLog:
         return tag in self.tags
 
     def is_in_progress(self):
-        return not self.is_done and not self.is_skip
+        return not self.is_ended()
 
     def is_ended(self):
-        return self.is_done or self.is_skip
+        return self.status in ["DONE, SKIP"]
 
     def get_log(self):
-        _is_done = "IN PROGRESS"
-        if self.is_done:
-            _time_ago = humanize.naturaltime(datetime.now(timezone.utc) - self.time)
-            _is_done = F"DONE  [{_time_ago}]"
-
-        if self.is_skip:
-            _time_ago = humanize.naturaltime(datetime.now(timezone.utc) - self.time)
-            _is_done = F"SKIP  [{_time_ago}]"
+        _time_ago = humanize.naturaltime(datetime.now(timezone.utc) - self.time)
 
         progress_msg = self.progress_text
-        progress_msg = progress_msg or f"{self.progress:>5}"
+        progress_msg = progress_msg or f"{self.progress:>5}" or "---"
 
-        return f"  ---[{self.name:>12}] [{self.sub_name:<28}] --> {progress_msg}   {_is_done}"
+        return f"  ---[{self.name:>12}] [{self.sub_name:<28}] --> {progress_msg}   {self.status:<10}  [{_time_ago}]"

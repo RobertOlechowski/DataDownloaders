@@ -1,7 +1,6 @@
 from datetime import datetime
 
 import pytz
-from ROTools.Helpers.DictObj import DictObj
 from bs4 import BeautifulSoup
 
 from source_code.helpers.other import is_equal, parse_float

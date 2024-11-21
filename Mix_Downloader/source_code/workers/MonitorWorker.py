@@ -1,10 +1,5 @@
 import pickle
-import humanize
 
-
-from datetime import datetime, timezone
-
-from ROTools.Helpers.Info import print_info
 from ROTools.Helpers.RedisSingletonLock import RedisSingletonLock
 
 
@@ -13,7 +8,6 @@ class MonitorWorker(object):
         self.config = config
         self.redis = self.config.get_redis()
         self.app_lock = RedisSingletonLock(self.redis, config.app.lock_timeout)
-        self.minio = self.config.get_minio()
 
         self.total_logs = 0
         self.log_dict = {}
@@ -58,7 +52,8 @@ class MonitorWorker(object):
         _lq_log = len(logs)
         self.total_logs += len(logs)
 
-        print(f"===\ttasks:[{_lq1:>4}]      log: [{_lq_log:>4}] [{self.total_logs:>4}]", flush=True)
+        _workers = self.config.app.worker_count
+        print(f"===\tt:{_lq1:>4}   w: {_workers:<3}   log: [{_lq_log:>4}] [{self.total_logs:>4}]", flush=True)
 
         logs_sorted = list(self.log_dict.values())
         logs_sorted.sort(key=lambda a: a.time, reverse=False)

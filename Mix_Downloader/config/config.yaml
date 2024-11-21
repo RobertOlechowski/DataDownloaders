@@ -6,8 +6,8 @@ app:
   lock_timeout: 5
   config_dump: true
   no_data_sleep_time: 2
-  log_count: 5
-  log_count_extra: 7
+  log_count: 7
+  log_count_extra: 10
 
 redis:
   host: ?????
@@ -20,22 +20,37 @@ minio:
   secret_key: ?????
   secure: false
 
+run:
+  - metal_price_api
+  - farside_btc
+  - farside_eth
+  - coinmarketcap
+
 metal_price_api:
   enable: False
   bucket_name: metal-price
   api_key: ????
 
 farside_btc:
-  enable: True
+  enable: False
   bucket_name: farside
   type: btc
   path: btc
   page: https://farside.co.uk/bitcoin-etf-flow-all-data/
 
 farside_eth:
-  enable: True
+  enable: False
   bucket_name: farside
   type: eth
   path: eth
   page: https://farside.co.uk/ethereum-etf-flow-all-data/
 
+coinmarketcap:
+  enable: False
+  bucket_name: coinmarketcap
+  time_per_request_limit: 1800
+  tasks:
+    symbols: True
+    exchanges: True
+    assets: True
+  api_key: ????

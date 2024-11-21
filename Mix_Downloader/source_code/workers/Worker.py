@@ -18,8 +18,9 @@ class Worker(BaseWorker):
         task_raw = self.redis.lpop("tasks")
         if task_raw is None:
             return None
-        step_class, step_config = pickle.loads(task_raw)
-        step_task = step_class(self.config, step_config)
+        step_class, step_config, params = pickle.loads(task_raw)
+        params = params or {}
+        step_task = step_class(self.config, step_config, **params)
         step_task.init()
         return step_task
 
