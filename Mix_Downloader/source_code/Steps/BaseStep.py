@@ -19,19 +19,22 @@ class BaseStep:
         if hasattr(self, 'init_impl'):
             self.init_impl()
 
-    def _build_status(self, is_skipped):
+    def _build_status(self, is_skipped, is_started):
         if is_skipped:
             return "SKIPPED"
+
+        if is_started:
+            return "START"
 
         if self.is_done:
             return "DONE"
 
         return "PROGRESS"
 
-    def send_log(self, step_name=None, phase="", is_skipped=False, progress_text=None, progress=0):
+    def send_log(self, step_name=None, phase="", is_skipped=False, progress_text=None, is_started=False, progress=0):
         step_name = step_name or self.name
 
-        status = self._build_status(is_skipped)
+        status = self._build_status(is_skipped, is_started)
 
         log = ProgresLog(name=step_name,
                          sub_name=phase,

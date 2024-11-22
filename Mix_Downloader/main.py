@@ -3,7 +3,7 @@ from ROTools.Helpers.WorkersCollection import WorkersCollection
 
 from source_code.Steps.Farside.FarsideStep import FarsideStep
 from source_code.Steps.Metal.MetalPriceStep import MetalPriceStep
-from source_code.Steps.Cmc.CmcBuilderStep import CmcBuilderStep
+from source_code.Steps.Cmc.CmcControllerStep import CmcControllerStep
 from source_code.helpers.config_builder import load_config
 from source_code.workers.Worker import Worker
 
@@ -25,7 +25,7 @@ if __name__ == '__main__':
         "metal_price_api": MetalPriceStep,
         "farside_btc": FarsideStep,
         "farside_eth": FarsideStep,
-        "coinmarketcap": CmcBuilderStep,
+        "coinmarketcap": CmcControllerStep,
     }
 
     print("START")

@@ -46,11 +46,16 @@ farside_eth:
   page: https://farside.co.uk/ethereum-etf-flow-all-data/
 
 coinmarketcap:
-  enable: False
+  enable: True
   bucket_name: coinmarketcap
-  time_per_request_limit: 1800
+  time_per_request_limit: 2000
+  symbol_rank_limit: 500
+  daily_range: 24
+  hourly_range: 1
   tasks:
     symbols: True
     exchanges: True
     assets: True
+    OHLCV_daily: True
+    OHLCV_hourly: True
   api_key: ????

@@ -14,11 +14,10 @@ def _get_object_name(name):
 
 
 class CmcAssetsStep(BaseStep):
-    def __init__(self, config, step_config):
+    def __init__(self, config, step_config, request_wrapper):
         super().__init__(config, step_config)
 
-        self.request_wrapper = CmcRequestWrapper(step_config)
-        self.rate_limiter = RateLimiter(step_config.time_per_request_limit, show_wait=False)
+        self.request_wrapper = request_wrapper
 
         self.name = "CMC"
         self.sub_name = "Assets"
@@ -46,8 +45,6 @@ class CmcAssetsStep(BaseStep):
 
 
     def process(self):
-        self.rate_limiter.call_wait()
-
         self.exchange_id = self.exchange_list.pop(0)
         self.params = dict(id=self.exchange_id)
         json_data = self.request_wrapper.get_data(endpoint=self.endpoint, params=self.params)

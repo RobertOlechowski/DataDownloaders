@@ -5,7 +5,7 @@ import traceback
 
 import requests
 from ROTools.Helpers.DictObj import DictObj
-from ROTools.Helpers.RequestHelper import get_session_data
+from ROTools.Helpers.RequestHelper import get_session_data, make_request_wrapper
 
 
 def _make_request_impl(endpoint, params, api_key):
@@ -42,21 +42,12 @@ def _make_request_impl(endpoint, params, api_key):
     return json_data["data"]
 
 
-def _make_request(**all_params):
-    for sleep_time in [1, 5, 15, 25, 45, 60, 90]:
-        try:
-            return _make_request_impl(**all_params)
-        except Exception as e:
-            print(f"Error [{repr(e)}] and sleep for {sleep_time}", file=sys.stderr)
-            traceback.print_exc()
-            time.sleep(sleep_time)
-    raise e
-
-
 class CmcRequestWrapper:
-    def __init__(self, step_config):
+    def __init__(self, step_config, rate_limiter):
         self.step_config = step_config
+        self.rate_limiter = rate_limiter
 
     def get_data(self, endpoint, params):
-        data = _make_request(endpoint=endpoint, params=params, api_key=self.step_config.api_key)
+        self.rate_limiter.call_wait()
+        data = make_request_wrapper(_make_request_impl, endpoint=endpoint, params=params, api_key=self.step_config.api_key)
         return data

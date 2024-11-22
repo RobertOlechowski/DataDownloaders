@@ -1,10 +1,5 @@
 from datetime import datetime, timezone
-
-from ROTools.Helpers.RateLimiter import RateLimiter
-
 from source_code.Steps.BaseStep import BaseStep
-from source_code.Steps.Cmc.CmcRequestWrapper import CmcRequestWrapper
-
 
 def _get_object_name(name):
     time = datetime.now(timezone.utc)
@@ -12,11 +7,10 @@ def _get_object_name(name):
 
 
 class CmcExchangeStep(BaseStep):
-    def __init__(self, config, step_config, status=None):
+    def __init__(self, config, step_config, status=None, request_wrapper=None):
         super().__init__(config, step_config)
 
-        self.request_wrapper = CmcRequestWrapper(step_config)
-        self.rate_limiter = RateLimiter(step_config.time_per_request_limit, show_wait=False)
+        self.request_wrapper = request_wrapper
 
         self.name = "CMC"
         self.sub_name = f"exchange_{status}"
@@ -33,8 +27,6 @@ class CmcExchangeStep(BaseStep):
             self.send_log(phase=self.sub_name, is_skipped=True)
 
     def process(self):
-        self.rate_limiter.call_wait()
-
         self.params["start"] = len(self.data_records) + 1
         json_data = self.request_wrapper.get_data(endpoint=self.endpoint, params=self.params)
 

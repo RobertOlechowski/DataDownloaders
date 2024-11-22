@@ -12,11 +12,10 @@ def _get_object_name(name):
 
 
 class CmcSymbolStep(BaseStep):
-    def __init__(self, config, step_config, mode, status=None):
+    def __init__(self, config, step_config, mode, status=None, request_wrapper=None):
         super().__init__(config, step_config)
 
-        self.request_wrapper = CmcRequestWrapper(step_config)
-        self.rate_limiter = RateLimiter(step_config.time_per_request_limit, show_wait=False)
+        self.request_wrapper = request_wrapper
 
         self.name = "CMC"
 

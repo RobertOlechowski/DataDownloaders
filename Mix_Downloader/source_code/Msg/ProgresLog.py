@@ -38,4 +38,4 @@ class ProgresLog:
         progress_msg = self.progress_text
         progress_msg = progress_msg or f"{self.progress:>5}" or "---"
 
-        return f"  ---[{self.name:>12}] [{self.sub_name:<28}] --> {progress_msg}   {self.status:<10}  [{_time_ago}]"
+        return f"  ---[{self.name:>12}] [{self.sub_name:<28}] {self.status:<10} --> {progress_msg}   [{_time_ago}]"
