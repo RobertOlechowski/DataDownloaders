@@ -6,8 +6,8 @@ app:
   lock_timeout: 5
   config_dump: true
   no_data_sleep_time: 2
-  log_count: 7
-  log_count_extra: 10
+  log_count: 10
+  log_count_extra: 15
 
 redis:
   host: ?????
@@ -67,5 +67,7 @@ biznes_radar:
   bucket_name: biznes-radar
   time_per_request_limit: 2000
   tasks:
-    symbols: True
-    recommendations: True
+    symbols: False
+    recommendations: False
+    eod: True
+    report: False

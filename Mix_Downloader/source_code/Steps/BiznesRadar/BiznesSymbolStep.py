@@ -6,10 +6,6 @@ from ROTools.Helpers.RateLimiter import RateLimiter
 from source_code.Steps.Cmc.CmcRequestWrapper import CmcRequestWrapper
 from source_code.Steps.BaseStep import BaseStep
 
-def _get_object_name():
-    time = datetime.now(timezone.utc)
-    return f"symbols/{time.year}/{time.year}_{time.month:02}_{time.day:02}.json"
-
 
 class BiznesSymbolStep(BaseStep):
     def __init__(self, config, step_config, request_wrapper=None):
@@ -19,7 +15,12 @@ class BiznesSymbolStep(BaseStep):
 
         self.name = "Biznes"
         self.sub_name = f"Symbols"
-        self.object_name = _get_object_name()
+        self.object_name = self.get_object_name()
+
+    @staticmethod
+    def get_object_name():
+        time = datetime.now(timezone.utc)
+        return f"symbols/{time.year}/{time.year}_{time.month:02}_{time.day:02}.json"
 
     def init_impl(self):
         if self.minio.object_exists(self.bucket_name, self.object_name):

@@ -55,8 +55,9 @@ class BaseStep:
 
         return "PROGRESS"
 
-    def send_log(self, step_name=None, phase="", is_skipped=False, progress_text=None, is_started=False, progress=0):
+    def send_log(self, step_name=None, phase=None, is_skipped=False, progress_text=None, is_started=False, progress=0):
         step_name = step_name or self.name
+        phase = phase or self.sub_name
 
         status = self._build_status(is_skipped, is_started)
 

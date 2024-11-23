@@ -10,6 +10,8 @@ import requests
 from ROTools.Helpers.DictObj import DictObj
 from ROTools.Helpers.RequestHelper import get_session_data, make_request_wrapper
 
+from source_code.Steps.BiznesRadar.BiznesEodRecord import BiznesEodRecord
+
 
 def _make_request_impl(endpoint):
     from bs4 import BeautifulSoup
@@ -52,15 +54,16 @@ class BiznesRequestWrapper:
         self.step_config = step_config
         self.rate_limiter = rate_limiter
 
-    def _get_and_select_data(self, endpoint, selector):
-        raw_data = make_request_wrapper(_make_request_impl, endpoint=endpoint)
-        table_data = raw_data.select(selector)
+    def _get_and_select_data(self, endpoint, selector, only_single_element=True):
+        raw_data = make_request_wrapper(_make_request_impl, endpoint=endpoint, sleep_times=(1, 2, 5, None))
+        selected_data = raw_data.select(selector)
 
-        if len(table_data) != 1:
-            raise Exception("Parse error")
+        if only_single_element:
+            if len(selected_data) != 1:
+                raise Exception("Parse error")
+            return selected_data[0]
 
-        return table_data[0]
-
+        return selected_data
 
     def get_symbols(self, symbol_type):
         self.rate_limiter.call_wait()
@@ -94,3 +97,29 @@ class BiznesRequestWrapper:
         data = [_build_recommendation_record(a) for a in data_rows]
 
         return data
+
+    def get_eod_paging(self, symbol=None):
+        self.rate_limiter.call_wait()
+        url = f"https://www.biznesradar.pl/notowania-historyczne/{symbol.ticker}"
+        paging = self._get_and_select_data(endpoint=url, selector="table.qTableFull + div.buttons > *", only_single_element=False)
+        max_page = [x.text for x in reversed(paging) if x.text.isnumeric()]
+        max_page = int(max_page[0]) if len(max_page) > 0 else 1
+        return max_page
+
+
+    def get_eod_data(self, symbol=None, index=1):
+        self.rate_limiter.call_wait()
+        url = f"https://www.biznesradar.pl/notowania-historyczne/{symbol.ticker},{index}"
+        table = self._get_and_select_data(endpoint=url, selector="main table.qTableFull")
+
+        row_header = table.select("tr th")
+        if len(row_header) not in [6, 7] or row_header[0].text != "Data":
+            raise Exception("Assert")
+
+        data_row = [tuple(b.text for b in a.select("tr td")) for a in table.select("tr")]
+        data_row = [a for a in data_row if len(a) in [6, 7]]
+        if len(data_row) < 1:
+            raise Exception("Data error")
+
+        return [BiznesEodRecord(a, symbol) for a in data_row]
+
