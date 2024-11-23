@@ -22,7 +22,7 @@ class CmcExchangeStep(BaseStep):
         self.data_records = []
 
     def init_impl(self):
-        if self.minio.object_exists(self.step_config.bucket_name, self.object_name):
+        if self.minio.object_exists(self.bucket_name, self.object_name):
             self.is_done = True
             self.send_log(phase=self.sub_name, is_skipped=True)
 
@@ -35,6 +35,6 @@ class CmcExchangeStep(BaseStep):
         self.is_done = len(json_data) == 0
 
         if  self.is_done:
-            self.minio.put_json(self.step_config.bucket_name, self.object_name, self.data_records)
+            self.minio.put_json(self.bucket_name, self.object_name, self.data_records)
 
         self.send_log(phase=self.sub_name, progress=len(self.data_records))

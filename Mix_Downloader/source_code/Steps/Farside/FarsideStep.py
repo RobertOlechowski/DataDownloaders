@@ -8,7 +8,8 @@ class FarsideStep(BaseStep):
     def __init__(self, config, step_config):
         super().__init__(config, step_config)
 
-        self.name = f"Farside {step_config.path}"
+        self.name = "Farside"
+        self.coin = step_config.path
 
         self.request_wrapper = FarsideRequestWrapper(self.step_config)
         self.bucket_name = step_config.bucket_name
@@ -20,12 +21,12 @@ class FarsideStep(BaseStep):
 
         if self.minio.object_exists(self.bucket_name, object_name):
             self.is_done = True
-            self.send_log(phase="object exists skip")
+            self.send_log(phase=self.coin, is_skipped=True)
             return
 
         data = self.request_wrapper.get_data()
 
         self.minio.put_json(self.bucket_name, object_name, data)
         self.is_done = True
-        self.send_log(phase="object added")
+        self.send_log(phase=self.coin)
 

@@ -27,7 +27,6 @@ class CmcOHLCVStep(BaseStep):
         self.params = dict(id=symbol.id, interval=interval, time_period=interval, count=5000)
         self.endpoint = "https://pro-api.coinmarketcap.com/v2/cryptocurrency/ohlcv/historical"
 
-        self.bucket_name = step_config.bucket_name
         self.counter = 0
         self._start_date = None
         self.data_wrapper = None
@@ -88,7 +87,7 @@ class CmcOHLCVStep(BaseStep):
         self._start_date = max(_start_date, last_date or _start_date)
 
         days_delta = (self._convert_date(datetime.now(timezone.utc)) - self._start_date).days
-        if days_delta <= 1:
+        if days_delta <= self.step_config.refresh_threshold_days:
             self.is_done = True
             self.send_log(phase=self.sub_name, is_skipped=True)
             return

@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+from ROTools.Helpers.DictObj import DictObj
 from ROTools.Helpers.RateLimiter import RateLimiter
 
 from source_code.Steps.Cmc.CmcRequestWrapper import CmcRequestWrapper
@@ -26,18 +27,23 @@ class CmcSymbolStep(BaseStep):
             self.endpoint = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/map"
 
         if mode == "fiat":
-            self.sub_name = f"{mode}"
+            self.sub_name = f"symbol_{mode}"
             self.object_name = _get_object_name(f"fiat")
             self.params = dict(include_metals=True, limit=5000)
             self.endpoint = "https://pro-api.coinmarketcap.com/v1/fiat/map"
 
         self.data_records = []
 
+    @staticmethod
+    def get_object_name_crypto(status):
+        object_name = _get_object_name(f"crypto_{status}")
+        return object_name
+
+
     def init_impl(self):
-        if self.minio.object_exists(self.step_config.bucket_name, self.object_name):
+        if self.minio.object_exists(self.bucket_name, self.object_name):
             self.is_done = True
             self.send_log(phase=self.sub_name, is_skipped=True)
-
 
     def process(self):
         self.params["start"] = len(self.data_records) + 1
@@ -47,6 +53,6 @@ class CmcSymbolStep(BaseStep):
         self.is_done = len(json_data) == 0
 
         if  self.is_done:
-            self.minio.put_json(self.step_config.bucket_name, self.object_name, self.data_records)
+            self.minio.put_json(self.bucket_name, self.object_name, self.data_records)
 
         self.send_log(phase=self.sub_name, progress=len(self.data_records))

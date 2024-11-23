@@ -1,11 +1,9 @@
 from datetime import datetime, timezone
 
 from ROTools.Helpers.DictObj import DictObj
-from ROTools.Helpers.RateLimiter import RateLimiter
 
 from source_code.Steps.BaseStep import BaseStep
 from source_code.Steps.Cmc.CmcExchangeStep import CmcExchangeStep
-from source_code.Steps.Cmc.CmcRequestWrapper import CmcRequestWrapper
 
 
 def _get_object_name(name):
@@ -32,13 +30,13 @@ class CmcAssetsStep(BaseStep):
         self.data_records = []
 
     def init_impl(self):
-        if self.minio.object_exists(self.step_config.bucket_name, self.object_name):
+        if self.minio.object_exists(self.bucket_name, self.object_name):
             self.is_done = True
             self.send_log(phase=self.sub_name, is_skipped=True)
             return
 
         exchange_object_name = CmcExchangeStep(self.config, self.step_config, status="active").object_name
-        exchanges = self.minio.get_json(self.step_config.bucket_name, exchange_object_name)
+        exchanges = self.minio.get_json(self.bucket_name, exchange_object_name)
         exchanges = [DictObj(a) for a in exchanges]
 
         self.exchange_list = [a.id for a in exchanges]
@@ -54,7 +52,7 @@ class CmcAssetsStep(BaseStep):
         self.is_done = len(self.exchange_list) == 0
 
         if self.is_done:
-            self.minio.put_json(self.step_config.bucket_name, self.object_name, self.data_records)
+            self.minio.put_json(self.bucket_name, self.object_name, self.data_records)
 
         self.send_log(phase=self.sub_name, progress=len(self.exchange_list))
 

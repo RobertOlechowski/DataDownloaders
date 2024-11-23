@@ -11,13 +11,37 @@ class BaseStep:
         self.minio = config.get_minio()
         self.redis = config.get_redis()
 
+        self.bucket_name = getattr(step_config, "bucket_name", None)
         self.init_done, self.is_done = False, False
+
+        self.steps = None
+        self.sub_name = None
 
     def init(self):
         self.init_done = True
 
         if hasattr(self, 'init_impl'):
             self.init_impl()
+
+    def _run_steps_in_this_thread(self):
+        self.send_log(phase=self.sub_name, progress=len(self.steps))
+
+        if len(self.steps) == 0:
+            self.is_done = True
+            self.send_log(phase=self.sub_name)
+            return
+
+        step_class, params = self.steps.pop(0)
+        step_task = step_class(self.config, self.step_config, request_wrapper=self.request_wrapper,  **params)
+        step_task.init()
+
+        if step_task.is_done:
+            return
+
+        while True:
+            step_task.process()
+            if step_task.is_done:
+                break
 
     def _build_status(self, is_skipped, is_started):
         if is_skipped:

@@ -9,7 +9,7 @@ import requests
 from ROTools.Helpers.DictObj import DictObj
 from ROTools.Helpers.RequestHelper import get_session_data, make_request_wrapper
 
-def _make_request_impl(endpoint, _, params):
+def _make_request_impl(endpoint, params):
     headers = {'content-type': 'application/json',
                'Accept-Encoding': 'gzip, deflate',
                'Accept': '*/*',
@@ -49,7 +49,7 @@ class MetalRequestWrapper:
             'api_key': self.task_config.api_key,
         }
 
-        _data = make_request_wrapper(endpoint, None, params, _make_request_impl)
+        _data = make_request_wrapper(_make_request_impl, endpoint=endpoint, params=params)
         keys = _data.symbols.__dict__.keys()
         _data = [(a, getattr(_data.symbols, a)) for a in keys]
         _data = [dict(symbol=a, name=b) for a, b in _data]
@@ -66,7 +66,7 @@ class MetalRequestWrapper:
             'currencies': ",".join(tickers)
         }
         tickers = set(tickers)
-        data = make_request_wrapper(endpoint, None, params, _make_request_impl)
+        data = make_request_wrapper(_make_request_impl, endpoint=endpoint, params=params)
 
         rates = data.rates
         rates = [(k, v) for k, v in rates.items() if k in tickers]

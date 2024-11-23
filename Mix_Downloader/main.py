@@ -1,6 +1,7 @@
 from ROTools.Helpers.Info import print_info
 from ROTools.Helpers.WorkersCollection import WorkersCollection
 
+from source_code.Steps.BiznesRadar.BiznesControllerStep import BiznesControllerStep
 from source_code.Steps.Farside.FarsideStep import FarsideStep
 from source_code.Steps.Metal.MetalPriceStep import MetalPriceStep
 from source_code.Steps.Cmc.CmcControllerStep import CmcControllerStep
@@ -16,7 +17,8 @@ if __name__ == '__main__':
 
     print_info()
     config = load_config(skip_dump=False)
-    monitor = MonitorWorker(config)
+    workers = WorkersCollection()
+    monitor = MonitorWorker(config, workers.stop_event)
     redis = config.get_redis()
 
     monitor.init()
@@ -26,6 +28,7 @@ if __name__ == '__main__':
         "farside_btc": FarsideStep,
         "farside_eth": FarsideStep,
         "coinmarketcap": CmcControllerStep,
+        "biznes_radar": BiznesControllerStep,
     }
 
     print("START")
@@ -38,7 +41,6 @@ if __name__ == '__main__':
         redis.rpush("tasks", pickle.dumps((stap_lut[config_name], step_config, None)))
 
 
-    workers = WorkersCollection()
     workers.add(Worker, config.app.worker_count)
     workers.run(monitor_cb=monitor.monitor_cb, monitor_refresh_time=config.app.monitor_refresh_time)
 

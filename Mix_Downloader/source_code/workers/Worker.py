@@ -4,16 +4,15 @@ from source_code.workers.BaseWorker import BaseWorker
 
 class Worker(BaseWorker):
     def __init__(self, index, stop_event):
-        super().__init__(stop_event, "task_producer", index)
-        self.redis = self.config.get_redis()
+        super().__init__(stop_event, "worker", index)
         self.context = None
 
     def init(self):
         pass
 
-    def _get_task(self):
+    def _set_context(self):
         if self.context is not None:
-            return self.context
+            return
 
         task_raw = self.redis.lpop("tasks")
         if task_raw is None:
@@ -22,15 +21,20 @@ class Worker(BaseWorker):
         params = params or {}
         step_task = step_class(self.config, step_config, **params)
         step_task.init()
-        return step_task
+        self.context = step_task
+        self.redis.sadd("workers", self.name)
+
 
     def step(self):
-        self.context = self._get_task()
+        self._set_context()
+
         if self.context is None:
             self._wait_for_data()
             return
 
         if not self.context.is_done:
             self.context.process()
+        else:
+            self.context = None
+            self.redis.srem("workers", self.name)
 
-        self.context = None if self.context.is_done else self.context

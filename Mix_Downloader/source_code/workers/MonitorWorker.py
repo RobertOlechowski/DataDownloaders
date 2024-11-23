@@ -4,18 +4,18 @@ from ROTools.Helpers.RedisSingletonLock import RedisSingletonLock
 
 
 class MonitorWorker(object):
-    def __init__(self, config):
+    def __init__(self, config, stop_event):
         self.config = config
         self.redis = self.config.get_redis()
         self.app_lock = RedisSingletonLock(self.redis, config.app.lock_timeout)
-
         self.total_logs = 0
+        self.stop_event = stop_event
         self.log_dict = {}
 
     def init(self):
         self.app_lock.acquire_lock()
 
-        _queue_names = ["tasks", "log"]
+        _queue_names = ["tasks", "log", "workers"]
         for item in _queue_names:
             self.redis.delete(item)
 
@@ -35,7 +35,7 @@ class MonitorWorker(object):
             self.log_dict[key] = log
             return
 
-        if _old_log.time < log.time:
+        if _old_log.time <= log.time:
             self.log_dict[key] = log
             log.tags = _old_log.tags
             return
@@ -75,3 +75,7 @@ class MonitorWorker(object):
                 print(item.get_log())
 
         print()
+
+        workers_size = self.redis.scard("workers")
+        if workers_size == 0 and _lq1 == 0:
+            self.stop_event.set()

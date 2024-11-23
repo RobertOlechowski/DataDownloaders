@@ -10,6 +10,7 @@ class BaseWorker:
         self.name = f"{name}-{index}"
         self.stop_event = stop_event
         self.config = load_config()
+        self.redis = self.config.get_redis()
 
     @classmethod
     def start(cls, index, stop_event):
@@ -31,3 +32,6 @@ class BaseWorker:
 
     def _wait_for_data(self):
         time.sleep(self.config.app.no_data_sleep_time)
+
+
+

@@ -11,7 +11,6 @@ class MetalPriceStep(BaseStep):
         self.name = "Metal"
         self.request_wrapper = MetalRequestWrapper(self.step_config)
 
-        self.bucket_name = self.step_config.bucket_name
         self.tickers = None
         self.query_time = None
 
@@ -38,7 +37,7 @@ class MetalPriceStep(BaseStep):
         symbols_object_name = f"symbols/{time.year}_{time.month:02}.json"
 
         self.minio.put_json(self.bucket_name, symbols_object_name, symbols)
-        self.send_log(phase="Tickers", progress=len(self.tickers))
+        self.send_log(progress=len(self.tickers), progress_text="Tickers")
 
     def process(self):
         if self.query_time is None:
@@ -46,7 +45,7 @@ class MetalPriceStep(BaseStep):
 
         if (datetime.now(timezone.utc).date() - self.query_time).days < 3:
             self.is_done = True
-            self.send_log(phase="Price END")
+            self.send_log()
             return
 
         if self.tickers is None:
@@ -60,7 +59,7 @@ class MetalPriceStep(BaseStep):
         data["timestamp"] = time_text
         self.minio.put_json(self.bucket_name, object_name, data)
 
-        self.send_log(phase=f"Price: {time_text}", progress=len(data["rates"]))
+        self.send_log(progress_text=time_text, progress=len(data["rates"]))
 
         self.query_time = self.query_time + timedelta(days=1)
 
