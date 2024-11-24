@@ -1,8 +1,12 @@
+from datetime import datetime, timezone
+
 from ROTools.Helpers.DictObj import DictObj
 from ROTools.Helpers.RateLimiter import RateLimiter
+
 from source_code.Steps.BaseStep import BaseStep
 from source_code.Steps.BiznesRadar.BiznesEodStep import BiznesEodStep
 from source_code.Steps.BiznesRadar.BiznesRecommendationsStep import BiznesRecommendationsStep
+from source_code.Steps.BiznesRadar.BiznesReportStep import BiznesReportStep
 from source_code.Steps.BiznesRadar.BiznesRequestWrapper import BiznesRequestWrapper
 from source_code.Steps.BiznesRadar.BiznesSymbolStep import BiznesSymbolStep
 
@@ -22,6 +26,14 @@ class BiznesControllerStep(BaseStep):
         if phase == "P2":
             self.steps = list(self._get_p2())
 
+    def init_impl(self):
+        days_delta = (datetime.now(timezone.utc).date() - self._get_last_refresh_time()).days
+        if days_delta <= self.step_config.global_refresh_threshold_days:
+            self.is_done = True
+            self.send_log(is_skipped=True)
+            return
+
+        self.send_log(is_started=True)
 
     def _get_p1(self):
         if self.step_config.tasks.symbols:
@@ -39,6 +51,10 @@ class BiznesControllerStep(BaseStep):
             for symbol in symbols:
                 yield BiznesEodStep, dict(symbol=symbol)
 
+        if self.step_config.tasks.report:
+            for symbol in symbols:
+                yield BiznesReportStep, dict(symbol=symbol)
+
     def _get_symbols(self):
         symbol_object_name = BiznesSymbolStep.get_object_name()
         symbols = self.minio.get_json(self.step_config.bucket_name, symbol_object_name)
@@ -47,5 +63,8 @@ class BiznesControllerStep(BaseStep):
 
     def process(self):
         self._run_steps_in_this_thread()
+
+        if self.is_done and all(self.step_config.tasks):
+            self._save_last_refresh_time()
 
 

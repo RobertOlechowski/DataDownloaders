@@ -43,7 +43,7 @@ class MetalPriceStep(BaseStep):
         if self.query_time is None:
             self.query_time = self._get_last_date()
 
-        if (datetime.now(timezone.utc).date() - self.query_time).days < 3:
+        if (datetime.now(timezone.utc).date() - self.query_time).days < self.step_config.refresh_threshold_days:
             self.is_done = True
             self.send_log()
             return

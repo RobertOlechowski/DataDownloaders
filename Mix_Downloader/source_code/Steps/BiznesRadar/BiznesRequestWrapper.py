@@ -1,17 +1,17 @@
 import hashlib
-import sys
-import threading
-import time
-import traceback
+import itertools
+import re
 from datetime import datetime
 
 import dateparser
 import requests
-from ROTools.Helpers.DictObj import DictObj
-from ROTools.Helpers.RequestHelper import get_session_data, make_request_wrapper
+from ROTools.Helpers.RequestHelper import make_request_wrapper
 
 from source_code.Steps.BiznesRadar.BiznesEodRecord import BiznesEodRecord
 
+
+def get_list(_list, index, _def=None):
+    return _list[index] if len(_list) > index else _def
 
 def _make_request_impl(endpoint):
     from bs4 import BeautifulSoup
@@ -48,6 +48,94 @@ def _build_recommendation_record(row):
 
     return dict(ticker=ticker, type=_type, pub_date=pub_date, author=author, target_price=target_price, link=link, file_name=file_name)
 
+class ReportFieldDAO:
+    def __init__(self, mode, field_id, field_text, column_obj, html_data):
+        self.ref_report = None
+        self.mode = mode
+        self.field_id = field_id
+        self.field_text = field_text
+        self.column = column_obj
+
+        self.report_key = f"{self.mode}___{self.column.time_id }"
+
+        _cell = html_data.select_one("span.value .pv, span.value .premium-value span")
+
+        self.value = self._parse_value(_cell)
+
+    def _parse_value(self, _cell):
+        if _cell is None:
+            return None
+
+        _cell = _cell.text.strip().replace(" ", "")
+        if self.field_id in ["PrimaryReport"]:
+            return datetime.strptime(_cell, "%Y-%m-%d")
+
+        if "." in _cell:
+            return float(_cell)
+
+        return int(_cell)
+
+    def is_valid(self):
+        if not self.column.is_valid:
+            return False
+
+        if self.mode == "Q" and self.column.period_id not in ["Q1", "Q2", "Q3", "Q4"]:
+            return False
+
+        if self.mode == "Y" and self.column.period_id not in ["Y"]:
+            return False
+
+        return True
+
+    def __repr__(self):
+        return f"{self.field_id}  {self.report_key}={self.value}"
+
+class DateColumnHead:
+    def __init__(self, mode, _index, html_node):
+        self.index = _index
+        self.is_valid = False
+        self.year = None
+        self.period_id = None
+        self.time_stamp = None
+        self.time_id = None
+
+        try:
+            self._parse_self(mode, html_node)
+            self.is_valid = True
+        except:
+            pass
+
+    def _parse_self(self, mode, html_node):
+        row_1 = html_node.contents[0].strip().split("/")
+
+        if len(row_1) not in [1, 2]:
+            raise Exception("Error date column")
+
+        self.year = int(row_1[0])
+        self.period_id = get_list(row_1, 1, "Y")
+
+        if mode == "Y" and self.period_id != "Y":
+            raise Exception("Error date column")
+
+        if mode == "Q" and self.period_id not in ["Q1", "Q2", "Q3", "Q4"]:
+            raise Exception("Error date column")
+
+        row_2 = html_node.find("span").text
+        row_2 = re.sub('[()]', "", row_2)
+
+        self.time_stamp = dateparser.parse(f"{self.year} {row_2}", languages=['pl'])
+        self.time_id = f"{self.time_stamp:%Y}:{self.period_id}"
+
+class ReportFieldBuilder:
+    def __init__(self, mode, field_text_dict, time_stamp_dict):
+        self.mode = mode
+        self.field_text_dict = field_text_dict
+        self.time_stamp_dict = time_stamp_dict
+
+    def build(self, index, field_id, html_node):
+        column_obj = self.time_stamp_dict[index]
+        field_text = self.field_text_dict[field_id],
+        return ReportFieldDAO(self.mode, field_id, field_text, column_obj, html_node)
 
 class BiznesRequestWrapper:
     def __init__(self, step_config, rate_limiter):
@@ -100,6 +188,33 @@ class BiznesRequestWrapper:
         data = [_build_recommendation_record(a) for a in data_rows]
 
         return data
+
+    def get_report_data(self, symbol, mode, page_code):
+        url = {
+            "zysk_strata": f"https://www.biznesradar.pl/raporty-finansowe-rachunek-zyskow-i-strat/{symbol.name},{mode}",
+            "bilans": f"https://www.biznesradar.pl/raporty-finansowe-bilans/{symbol.name},{mode}",
+            "przeplyw": f"https://www.biznesradar.pl/raporty-finansowe-przeplywy-pieniezne/{symbol.name},{mode}",
+            "ws_wartosci": f"https://www.biznesradar.pl/wskazniki-wartosci-rynkowej/{symbol.name}",
+        }[page_code]
+
+        table = self._get_and_select_data(endpoint=url, selector="main table.report-table")
+
+        _col_head = [DateColumnHead(mode, _index, a) for _index, a in enumerate(table.select("tr:first-child th.thq"))]
+        _time_stamp_dict = {a.index: a for a in _col_head}
+
+        _row_head = [(a.parent['data-field'], a.text) for a in table.select("tr td.f")]
+        _field_text_dict = {a: b for a, b in _row_head}
+
+        _builder = ReportFieldBuilder(mode, _field_text_dict, _time_stamp_dict)
+
+        table = table.select("tr[data-field]:has(td.h)")
+        all_data = [(item["data-field"], item.select("td.h")) for item in table]
+        all_data = [[_builder.build(_index, field_id, html_node) for _index, html_node in enumerate(html_nodes)] for field_id, html_nodes in all_data]
+
+        all_data = [a for a in itertools.chain.from_iterable(all_data) if a.is_valid()]
+
+        return all_data, _row_head
+
 
     def get_eod_data_and_paging(self, symbol=None, index=1):
         self.rate_limiter.call_wait()

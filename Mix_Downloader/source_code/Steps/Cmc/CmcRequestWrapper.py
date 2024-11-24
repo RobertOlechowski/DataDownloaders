@@ -1,9 +1,3 @@
-import sys
-import threading
-import time
-import traceback
-
-import requests
 from ROTools.Helpers.DictObj import DictObj
 from ROTools.Helpers.RequestHelper import get_session_data, make_request_wrapper
 

@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
 
     workers.add(Worker, config.app.worker_count)
-    workers.run(monitor_cb=monitor.monitor_cb, monitor_refresh_time=config.app.monitor_refresh_time)
+    workers.run(monitor_cb=monitor.monitor_cb, monitor_refresh_time=config.monitor.refresh_time)
 
     monitor.app_lock.release_lock()
 

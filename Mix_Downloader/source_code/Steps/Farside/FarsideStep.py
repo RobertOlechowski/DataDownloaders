@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
-from source_code.Steps.Farside.FarsideRequestWrapper import FarsideRequestWrapper
 from source_code.Steps.BaseStep import BaseStep
+from source_code.Steps.Farside.FarsideRequestWrapper import FarsideRequestWrapper
 
 
 class FarsideStep(BaseStep):

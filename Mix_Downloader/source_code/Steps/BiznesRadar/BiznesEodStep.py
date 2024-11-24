@@ -1,10 +1,11 @@
 from datetime import datetime, timezone
 from itertools import groupby
+
 from ROTools.Helpers.DictObj import DictObj
 
-from source_code.Steps.BiznesRadar.BiznesEodRecord import BiznesEodRecord
-from source_code.Steps.BiznesRadar.BiznesSymbolStep import BiznesSymbolStep
 from source_code.Steps.BaseStep import BaseStep
+from source_code.Steps.BiznesRadar.BiznesEodRecord import BiznesEodRecord
+
 
 def _get_object_name(year, symbol):
     return f"{_get_symbol_dir(symbol)}/{year}_{symbol.ticker}.json"

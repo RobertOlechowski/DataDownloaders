@@ -1,4 +1,5 @@
 import pickle
+from datetime import datetime, timezone
 
 from source_code.Msg.ProgresLog import ProgresLog
 
@@ -22,6 +23,16 @@ class BaseStep:
 
         if hasattr(self, 'init_impl'):
             self.init_impl()
+
+    def _get_last_refresh_time(self):
+        data = self.minio.get_json(self.bucket_name, "meta.json")
+        if data is None:
+            return datetime.fromisoformat('1900-01-01').date()
+        return datetime.fromisoformat(data['last_refresh_time']).date()
+
+    def _save_last_refresh_time(self):
+        last_refresh_time = datetime.now(timezone.utc).date().isoformat()
+        self.minio.put_json(self.bucket_name, "meta.json", dict(last_refresh_time=last_refresh_time))
 
     def _run_steps_in_this_thread(self):
         self.send_log(phase=self.sub_name, progress=len(self.steps))
@@ -57,7 +68,7 @@ class BaseStep:
 
     def send_log(self, step_name=None, phase=None, is_skipped=False, progress_text=None, is_started=False, progress=0):
         step_name = step_name or self.name
-        phase = phase or self.sub_name
+        phase = phase or self.sub_name or ""
 
         status = self._build_status(is_skipped, is_started)
 

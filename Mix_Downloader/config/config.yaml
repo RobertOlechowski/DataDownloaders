@@ -1,11 +1,12 @@
 !Config
 app:
-  monitor_refresh_time: 1
-  monitor_observation: 60
   worker_count:  3
   lock_timeout: 5
   config_dump: true
-  no_data_sleep_time: 2
+  no_data_sleep_time: 1
+
+monitor:
+  refresh_time: 1
   log_count: 10
   log_count_extra: 15
 
@@ -30,6 +31,7 @@ run:
 metal_price_api:
   enable: False
   bucket_name: metal-price
+  refresh_threshold_days: 3
   api_key: ????
 
 farside_btc:
@@ -47,13 +49,14 @@ farside_eth:
   page: https://farside.co.uk/ethereum-etf-flow-all-data/
 
 coinmarketcap:
-  enable: False
+  enable: True
   bucket_name: coinmarketcap
   time_per_request_limit: 2000
   symbol_rank_limit: 500
   daily_range: 24
   hourly_range: 1
   refresh_threshold_days: 5
+  global_refresh_threshold_days: 3
   tasks:
     symbols: True
     exchanges: True
@@ -67,9 +70,10 @@ biznes_radar:
   bucket_name: biznes-radar
   time_per_request_limit: 2000
   refresh_threshold_days: 10
-  skip_eod: [IFC]
+  global_refresh_threshold_days: 3
+  skip_eod: [IFC, TIM, ARE, PFM, BAH, MLK, PGM, YRL, FOR, WIG-ESG, WIGtech]
   tasks:
-    symbols: False
-    recommendations: False
+    symbols: True
+    recommendations: True
     eod: True
     report: False

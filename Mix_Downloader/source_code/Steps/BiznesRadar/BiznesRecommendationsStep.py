@@ -1,9 +1,9 @@
 from datetime import datetime, timezone
-import os
 
 import requests
 
 from source_code.Steps.BaseStep import BaseStep
+
 
 def _get_object_name():
     time = datetime.now(timezone.utc)

@@ -1,9 +1,9 @@
 # MIX downloader
 
 - Dokończyć Biznes
-- Dodać skip dla Biznes_Eod i CNC   globalny skip 
+- OtoDom pobierać
+- Poligon pobierać pliki
+- sortowanie logów progress na końcu. usuwanie starych skip i done. rnum do logów z fazą started, done, skipped
 
 Todo:
- - Poligon pobierać pliki 
  - Dane lotów pobierać
- - OtoDom pobierać

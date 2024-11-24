@@ -6,6 +6,7 @@ from ROTools.Helpers.RedisSingletonLock import RedisSingletonLock
 class MonitorWorker(object):
     def __init__(self, config, stop_event):
         self.config = config
+        self.monitor_config = config.monitor
         self.redis = self.config.get_redis()
         self.app_lock = RedisSingletonLock(self.redis, config.app.lock_timeout)
         self.total_logs = 0
@@ -63,11 +64,11 @@ class MonitorWorker(object):
             item.del_tag("to_show")
             item.del_tag("to_show_extra")
 
-            if item.is_ended() and not item.check_tag("seen") and counter < self.config.app.log_count_extra:
+            if item.is_ended() and not item.check_tag("seen") and counter < self.monitor_config.log_count_extra:
                 counter += 1
                 item.add_tag("to_show_extra")
 
-        for item in logs_sorted[-self.config.app.log_count:]:
+        for item in logs_sorted[-self.monitor_config.log_count:]:
             item.add_tag("to_show")
 
             if item.is_in_progress() or item.check_tag("to_show") or item.check_tag("to_show_extra"):

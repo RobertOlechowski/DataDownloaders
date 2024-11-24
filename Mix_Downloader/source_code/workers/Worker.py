@@ -2,6 +2,7 @@ import pickle
 
 from source_code.workers.BaseWorker import BaseWorker
 
+
 class Worker(BaseWorker):
     def __init__(self, index, stop_event):
         super().__init__(stop_event, "worker", index)
