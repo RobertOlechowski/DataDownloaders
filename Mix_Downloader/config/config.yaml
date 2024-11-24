@@ -29,20 +29,20 @@ run:
   - biznes_radar
 
 metal_price_api:
-  enable: False
+  enable: True
   bucket_name: metal-price
   refresh_threshold_days: 3
   api_key: ????
 
 farside_btc:
-  enable: False
+  enable: True
   bucket_name: farside
   type: btc
   path: btc
   page: https://farside.co.uk/bitcoin-etf-flow-all-data/
 
 farside_eth:
-  enable: False
+  enable: True
   bucket_name: farside
   type: eth
   path: eth

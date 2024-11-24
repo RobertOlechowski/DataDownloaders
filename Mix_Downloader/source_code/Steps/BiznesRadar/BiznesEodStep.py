@@ -4,7 +4,7 @@ from itertools import groupby
 from ROTools.Helpers.DictObj import DictObj
 
 from source_code.Steps.BaseStep import BaseStep
-from source_code.Steps.BiznesRadar.BiznesEodRecord import BiznesEodRecord
+from source_code.Steps.BiznesRadar.helpers.BiznesEodRecord import BiznesEodRecord
 
 
 def _get_object_name(year, symbol):

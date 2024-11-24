@@ -1,6 +1,8 @@
+import itertools
 from datetime import datetime, timezone
 
 from source_code.Steps.BaseStep import BaseStep
+from source_code.Steps.BiznesRadar.helpers.SubReport import merge_reports
 
 
 #def _get_object_name(year, symbol):
@@ -22,15 +24,11 @@ class BiznesReportStep(BaseStep):
         self.request_wrapper = request_wrapper
 
         self.name = "Biznes"
-        self.sub_name = f"EOD {symbol.ticker}"
+        self.sub_name = f"Report {symbol.ticker}"
         self.symbol = symbol
 
-        self.max_pages = None
-        self.current_page = 1
-
-
-        self.last_section_last_date = datetime.fromisoformat('1900-01-01').date()
-        self.data_for_symbol = []
+        self.pages = [*itertools.product(["zysk_strata", "bilans", "przeplyw"], ["Q", "Y"]), ("ws_wartosci", "Q")]
+        self.all_reports = []
 
     def init_impl(self):
         last_date = self.get_last_refresh_time()
@@ -45,26 +43,19 @@ class BiznesReportStep(BaseStep):
 
 
     def process(self):
+        if len(self.pages) > 0:
+            page_code, mode = self.pages.pop(0)
+            reports = self.request_wrapper.get_report_data(symbol=self.symbol, mode=mode, page_code=page_code)
+            self.all_reports.extend(reports)
+            self.send_log(progress_text=f"{mode} {page_code} {len(self.pages)}")
+            return
+
+        dd = merge_reports(self.all_reports)
+        #todo: sprawdzić czy data bublikacji jest dostępna
+
         self.is_done = True
-        return
-        self.max_pages, page_data = self.request_wrapper.get_eod_data_and_paging(symbol=self.symbol, index=self.current_page)
+        self.send_log()
 
-        filtered_data = [a for a in page_data if a.time > self.last_section_last_date]
-
-        _stop_early = len(filtered_data) != len(page_data)
-        self.data_for_symbol.extend(filtered_data)
-
-        self.send_log(progress_text=f"[pages={self.current_page:>3} of {self.max_pages:>3}]")
-
-        self.current_page = self.current_page + 1
-        if self.current_page > self.max_pages or _stop_early:
-            if len(filtered_data) > 0:
-                self._save_data()
-                self.is_done = True
-                self.send_log(progress_text="SAVED")
-            else:
-                self.is_done = True
-                self.send_log(progress_text="NO DATA")
 
 
     def get_last_refresh_time(self):

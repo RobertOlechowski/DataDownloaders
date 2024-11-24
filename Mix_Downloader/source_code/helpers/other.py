@@ -2,6 +2,9 @@ def is_equal(a, b, epsilon=1e-6):
     return abs(a - b) < epsilon
 
 
+def get_list(_list, index, default=None):
+    return _list[index] if len(_list) > index else default
+
 def group_list(data, cb):
     from collections import defaultdict
     db = defaultdict(list)
