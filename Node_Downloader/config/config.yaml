@@ -1,22 +1,26 @@
 !Config
 app:
-  monitor_refresh_time: 1
-  monitor_observation: 60
-  downloader_count:  3
+  worker_count:  3
   lock_timeout: 5
   config_dump: true
   sleep_time: 1
-  cache_bucket: btc
+
+monitor:
+  refresh_time: 1
+  observation: 60
+
+id_producer:
+  max_queue_size: 300
+  sleep_log: false
+
+worker:
+  delay_start: 1.5
+  sleep_log: false
 
 redis:
   host: redis
   port: 5030
   db: 0
-
-node:
-  endpoint: ?????
-  user: ?????
-  password: ?????
 
 minio:
   endpoint: mimo
@@ -24,12 +28,12 @@ minio:
   secret_key: ?????
   secure: false
 
+run:
+  - btc
 
-id_producer:
-  max_queue_size: 300
-  sleep_log: false
-
-block_downloader:
-  delay_start: 1.5
-  max_queue_size: 300
-  sleep_log: false
+nodes:
+  btc:
+    bucket_name: btc
+    endpoint: ?????
+    user: ?????
+    password: ?????

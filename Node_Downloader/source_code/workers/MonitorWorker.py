@@ -2,6 +2,7 @@ import pickle
 
 from ROTools.Helpers.Info import print_info
 from ROTools.Helpers.RedisSingletonLock import RedisSingletonLock
+
 from source_code.helpers.BtcNode import BtcNode
 
 
@@ -10,7 +11,7 @@ class MonitorWorker(object):
         self.config = config
         self.redis = self.config.get_redis()
         self.app_lock = RedisSingletonLock(self.redis, config.app.lock_timeout)
-        self.node = BtcNode(self.config)
+        self.node = BtcNode(self.config.nodes.btc)
         self.max_block_height = None
 
     def init(self):
@@ -27,15 +28,15 @@ class MonitorWorker(object):
         config = self.config
 
         log_records = [pickle.loads(a) for a in self.redis.lrange("log", 0, -1)]
-        old_logs = [a for a in log_records if a.is_older_than(config.app.monitor_observation)]
+        old_logs = [a for a in log_records if a.is_older_than(config.monitor.observation)]
 
         to_delete = len(old_logs)
         self.redis.lpop("log", count=to_delete)
 
         all_elements = [pickle.loads(a) for a in self.redis.lrange("log", 0, -1)]
 
-        _lq1 = self.redis.llen("block_ids")
-        _w2 = config.app.downloader_count
+        _lq1 = self.redis.llen("tasks")
+        _w2 = config.app.worker_count
 
         _lq_log = len(all_elements)
 

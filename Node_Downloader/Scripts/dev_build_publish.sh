@@ -4,7 +4,7 @@ set -e
 clear
 
 export github_repo="ghcr.io/robertolechowski"
-export image_name="btc-downloader"
+export image_name="node-downloader"
 
 version=$(python3 utls/buildUtls.py get_ver)
 build_time=$(python3 utls/buildUtls.py time)
