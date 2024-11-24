@@ -54,8 +54,7 @@ class BiznesRequestWrapper:
         self.step_config = step_config
         self.rate_limiter = rate_limiter
 
-    def _get_and_select_data(self, endpoint, selector, only_single_element=True):
-        raw_data = make_request_wrapper(_make_request_impl, endpoint=endpoint, sleep_times=(1, 2, 5, None))
+    def _select_data(self, raw_data, selector, only_single_element=True):
         selected_data = raw_data.select(selector)
 
         if only_single_element:
@@ -64,6 +63,10 @@ class BiznesRequestWrapper:
             return selected_data[0]
 
         return selected_data
+
+    def _get_and_select_data(self, endpoint, selector, only_single_element=True):
+        raw_data = make_request_wrapper(_make_request_impl, endpoint=endpoint, sleep_times=(1, 2, 5, None))
+        return self._select_data(raw_data, selector, only_single_element)
 
     def get_symbols(self, symbol_type):
         self.rate_limiter.call_wait()
@@ -98,19 +101,20 @@ class BiznesRequestWrapper:
 
         return data
 
-    def get_eod_paging(self, symbol=None):
-        self.rate_limiter.call_wait()
-        url = f"https://www.biznesradar.pl/notowania-historyczne/{symbol.ticker}"
-        paging = self._get_and_select_data(endpoint=url, selector="table.qTableFull + div.buttons > *", only_single_element=False)
-        max_page = [x.text for x in reversed(paging) if x.text.isnumeric()]
-        max_page = int(max_page[0]) if len(max_page) > 0 else 1
-        return max_page
-
-
-    def get_eod_data(self, symbol=None, index=1):
+    def get_eod_data_and_paging(self, symbol=None, index=1):
         self.rate_limiter.call_wait()
         url = f"https://www.biznesradar.pl/notowania-historyczne/{symbol.ticker},{index}"
-        table = self._get_and_select_data(endpoint=url, selector="main table.qTableFull")
+        try:
+            raw_data = make_request_wrapper(_make_request_impl, endpoint=url, sleep_times=(1, 2, 5, None))
+            paging = self._select_data(raw_data, selector="table.qTableFull + div.buttons > *", only_single_element=False)
+            table = self._select_data(raw_data, selector="main table.qTableFull")
+        except Exception as e:
+            raise Exception(f"ticker = [{symbol.ticker}] url = [{url}] error: {e}")
+
+        max_page = [x.text for x in reversed(paging) if x.text.isnumeric()]
+        max_page = int(max_page[0]) if len(max_page) > 0 else 1
+
+        table = self._select_data(raw_data, selector="main table.qTableFull")
 
         row_header = table.select("tr th")
         if len(row_header) not in [6, 7] or row_header[0].text != "Data":
@@ -121,5 +125,7 @@ class BiznesRequestWrapper:
         if len(data_row) < 1:
             raise Exception("Data error")
 
-        return [BiznesEodRecord(a, symbol) for a in data_row]
+        return max_page, [BiznesEodRecord(a, symbol) for a in data_row]
+
+
 

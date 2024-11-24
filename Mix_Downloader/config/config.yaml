@@ -66,6 +66,8 @@ biznes_radar:
   enable: True
   bucket_name: biznes-radar
   time_per_request_limit: 2000
+  refresh_threshold_days: 10
+  skip_eod: [IFC]
   tasks:
     symbols: False
     recommendations: False
