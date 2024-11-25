@@ -2,8 +2,8 @@ from datetime import datetime
 
 
 class ProgresLog:
-    def __init__(self, name, height):
-        self.name = name
+    def __init__(self, node_type, height):
+        self.node_type = node_type
         self.height = height
         self.time = datetime.now()
 

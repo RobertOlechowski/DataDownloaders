@@ -1,35 +1,4 @@
-from collections import defaultdict
 from datetime import datetime
-from itertools import chain, groupby
-
-
-def merge_reports(reports):
-    grouped = defaultdict(list)
-    for item in reports:
-        grouped[item.period.time_id].append(item)
-
-    result = []
-    for period_text, items in grouped.items():
-        if len(items) < 3:
-            continue
-
-        period = items[0].period
-        records = list(chain.from_iterable([a.records for a in items]))
-        result.append(Report(period, records))
-    return result
-
-class Report:
-    def __init__(self, period, records):
-        self.period = period
-
-        grouped = defaultdict(list)
-        for k, name, value in records:
-            grouped[k].append((k, name, value))
-
-        dvgdf
-        #todo: sprawdzić date taka sama reszta po jednym tylko
-        pass
-
 
 class SubReport:
     def __init__(self, period, data, report_fields, page):

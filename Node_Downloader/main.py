@@ -26,9 +26,8 @@ if __name__ == '__main__':
         redis.delete(item)
 
     minio = config.get_minio()
-    for item_name in config.run:
-        item = getattr(config.nodes, item_name)
-        minio.create_bucket(item.bucket_name)
+    for bucket_name in [getattr(config.tasks, a).bucket_name for a in config.run] :
+        minio.create_bucket(bucket_name)
 
     workers = WorkersCollection()
     workers.add(IdProducer, 1, start=True)

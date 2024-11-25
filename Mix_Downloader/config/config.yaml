@@ -1,6 +1,6 @@
 !Config
 app:
-  worker_count:  3
+  worker_count:  4
   lock_timeout: 5
   config_dump: true
   no_data_sleep_time: 1
@@ -31,7 +31,7 @@ run:
 metal_price_api:
   enable: True
   bucket_name: metal-price
-  refresh_threshold_days: 3
+  refresh_threshold_days: 5
   api_key: ????
 
 farside_btc:
@@ -56,7 +56,7 @@ coinmarketcap:
   daily_range: 24
   hourly_range: 1
   refresh_threshold_days: 5
-  global_refresh_threshold_days: 3
+  global_refresh_threshold_days: 5
   tasks:
     symbols: True
     exchanges: True
@@ -69,11 +69,11 @@ biznes_radar:
   enable: True
   bucket_name: biznes-radar
   time_per_request_limit: 2000
-  refresh_threshold_days: 10
-  global_refresh_threshold_days: 3
-  skip_eod: [IFC, TIM, ARE, PFM, BAH, MLK, PGM, YRL, FOR, WIG-ESG, WIGtech]
+  refresh_threshold_days: 5
+  global_refresh_threshold_days: -3
+  skip_eod: [Brent, MSG, MGS, IFC, TIM, ARE, PFM, BAH, MLK, PGM, YRL, FOR, WIG-ESG, WIGtech]
   tasks:
-    symbols: True
-    recommendations: True
+    symbols: False
+    recommendations: False
     eod: True
     report: False

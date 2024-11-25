@@ -35,7 +35,7 @@ def _make_request_impl(node_config, method, params):
 
 _sleep_times=(1, 5, 10, 15, None)
 
-class BtcNode:
+class BtcRequestWrapper:
     def __init__(self, config):
         self.node_config = config
 

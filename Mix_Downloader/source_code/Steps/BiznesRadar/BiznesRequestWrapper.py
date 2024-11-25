@@ -123,7 +123,7 @@ class BiznesRequestWrapper:
 
     def get_eod_data_and_paging(self, symbol=None, index=1):
         self.rate_limiter.call_wait()
-        url = f"https://www.biznesradar.pl/notowania-historyczne/{symbol.ticker},{index}"
+        url = f"https://www.biznesradar.pl/notowania-historyczne/{symbol.name},{index}"
         try:
             raw_data = make_request_wrapper(_make_request_impl, endpoint=url, sleep_times=(1, 2, 5, None))
             paging = self._select_data(raw_data, selector="table.qTableFull + div.buttons > *", only_single_element=False)

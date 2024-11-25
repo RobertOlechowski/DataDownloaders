@@ -20,6 +20,9 @@ class ReportPeriod:
         except:
             self.is_valid = False
 
+    def to_dict(self):
+        return dict(yrar=self.year, period_id=self.period_id, time_stamp=self.time_stamp.isoformat(), time_text=self.time_id)
+
     def _parse_self(self, mode):
         row_1 = self.raw_data[0].split("/")
 

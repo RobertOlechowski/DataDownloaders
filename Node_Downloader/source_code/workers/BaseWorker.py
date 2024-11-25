@@ -4,12 +4,12 @@ import traceback
 
 from source_code.config.Config import ConfigLoader
 
+def get_block_object_name(coin_name, block_height):
+    if coin_name == "btc":
+        block_group = f"{block_height:08d}"[:4]
+        return f"blocks_{block_group}/block_{block_height:08d}.json"
 
-def get_block_object_name(height):
-    number_text = f"{height:08d}"
-    s1 = number_text[:4]
-    return f"blocks_{s1}/block_{number_text}.json"
-
+    raise Exception("Invalid coin")
 
 class BaseWorker:
     def __init__(self, stop_event, name, index):

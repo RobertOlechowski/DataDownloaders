@@ -71,7 +71,7 @@ class CmcControllerStep(BaseStep):
     def process(self):
         self._run_steps_in_this_thread()
 
-        if self.is_done and all(self.step_config.tasks):
+        if self.is_done:
             self._save_last_refresh_time()
 
 

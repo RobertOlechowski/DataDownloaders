@@ -1,10 +1,11 @@
 # MIX downloader
 
-- Dokończyć Biznes   dodać automatyczne logowanie
-- OtoDom pobierać
-- Poligon pobierać pliki
-- sortowanie logów progress na końcu. usuwanie starych skip i done. rnum do logów z fazą started, done, skipped
+## Todo [important]
 - NodeDownloader
+- Poligon pobierać pliki
 
-Todo:
+
+## Todo [Backlog]
  - Dane lotów pobierać
+- OtoDom pobierać
+- sortowanie logów progress na końcu. usuwanie starych skip i done. rnum do logów z fazą started, done, skipped

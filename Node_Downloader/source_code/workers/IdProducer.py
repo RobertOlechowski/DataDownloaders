@@ -1,7 +1,7 @@
 
 import pickle
 
-from source_code.helpers.BtcNode import BtcNode
+from source_code.nodes.btc.BtcRequestWrapper import BtcRequestWrapper
 from source_code.workers.BaseWorker import BaseWorker, get_block_object_name
 
 
@@ -24,15 +24,17 @@ class IdProducer(BaseWorker):
         self.redis = self.config.get_redis()
         self.minio = self.config.get_minio()
 
-        self.node = BtcNode(self.config.nodes.btc)
-        self.btc_config = self.config.nodes.btc
+        #self.nodes = [getattr(self.config.tasks, a).bucket_name for a in self.config.run]
+
+        self.node = BtcRequestWrapper(self.config.tasks.btc.node)
+        self.btc_config = self.config.tasks.btc
         self._start_range = None
 
     def get_top_block_height(self):
         _test_range = 200
 
         def is_present(numer) -> bool:
-            object_name = get_block_object_name(numer)
+            object_name = get_block_object_name(block_height=numer, coin_name="btc")
             return self.minio.object_exists(self.btc_config.bucket_name, object_name)
 
         _highest = _find_highest(is_present)
@@ -60,12 +62,10 @@ class IdProducer(BaseWorker):
 
     def step(self):
         max_queue_size = self.local_config.max_queue_size
-
         queue_size = self.redis.llen("tasks")
         batch_size = max_queue_size - queue_size + 1
 
-        _max_id = self.node.get_latest_block_number()
-        _end_range = min(self._start_range + batch_size, _max_id)
+        _end_range = min(self._start_range + batch_size, self.node.get_latest_block_number())
         elements = list(range(self._start_range, _end_range+1))
 
         if queue_size >= (0.8 * max_queue_size) or len(elements) == 0:

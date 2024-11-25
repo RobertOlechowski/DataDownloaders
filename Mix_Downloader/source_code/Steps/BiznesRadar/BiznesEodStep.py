@@ -14,7 +14,7 @@ def _get_meta_object_name(symbol):
     return f"{_get_symbol_dir(symbol)}/meta.json"
 
 def _get_symbol_dir(symbol):
-    return f"eod/{symbol.ticker}"
+    return f"eod/{symbol.type}/{symbol.ticker}"
 
 def _get_dir_prefix(symbol):
     return f"{_get_symbol_dir(symbol)}/"
@@ -28,6 +28,7 @@ class BiznesEodStep(BaseStep):
         self.name = "Biznes"
         self.sub_name = f"EOD {symbol.ticker}"
         self.symbol = symbol
+        self.symbol_type = symbol.type
 
         self.max_pages = None
         self.current_page = 1
@@ -72,6 +73,11 @@ class BiznesEodStep(BaseStep):
 
     def _save_data(self):
         sorted_records = sorted(self.data_for_symbol, key=lambda x: x.time)
+
+        dates = [a.time for a in sorted_records]
+
+        if len(dates) != len(set(dates)):
+            raise Exception("Not unique dates")
 
         grouped_by_year = {
             year: list(group)

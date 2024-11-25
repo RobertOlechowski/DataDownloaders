@@ -17,6 +17,7 @@ class BaseStep:
 
         self.steps = None
         self.sub_name = None
+        self.step_task = None
 
     def init(self):
         self.init_done = True
@@ -37,22 +38,24 @@ class BaseStep:
     def _run_steps_in_this_thread(self):
         self.send_log(phase=self.sub_name, progress=len(self.steps))
 
-        if len(self.steps) == 0:
-            self.is_done = True
-            self.send_log(phase=self.sub_name)
+        if self.step_task is None:
+            if len(self.steps) == 0:
+                self.is_done = True
+                self.send_log(phase=self.sub_name)
+                return
+
+            step_class, params = self.steps.pop(0)
+            self.step_task = step_class(self.config, self.step_config, request_wrapper=self.request_wrapper,  **params)
+            self.step_task.init()
+
+        if self.step_task.is_done:
+            self.step_task = None
             return
 
-        step_class, params = self.steps.pop(0)
-        step_task = step_class(self.config, self.step_config, request_wrapper=self.request_wrapper,  **params)
-        step_task.init()
+        self.step_task.process()
+        if self.step_task.is_done:
+            self.step_task = None
 
-        if step_task.is_done:
-            return
-
-        while True:
-            step_task.process()
-            if step_task.is_done:
-                break
 
     def _build_status(self, is_skipped, is_started):
         if is_skipped:

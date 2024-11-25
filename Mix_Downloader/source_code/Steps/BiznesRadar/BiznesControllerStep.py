@@ -47,12 +47,13 @@ class BiznesControllerStep(BaseStep):
     def _get_p2(self):
         symbols = self._get_symbols()
         symbols = [a for a in symbols if a.ticker not in self.step_config.skip_eod]
+
         if self.step_config.tasks.eod:
-            for symbol in symbols:
+            for symbol in [a for a in symbols if a.type in ["CFD", "Index"]]: # "GPW", "NewConnect"  "CFD", "Index"
                 yield BiznesEodStep, dict(symbol=symbol)
 
         if self.step_config.tasks.report:
-            for symbol in symbols:
+            for symbol in [a for a in symbols if a.type in ["GPW", "NewConnect"]]:
                 yield BiznesReportStep, dict(symbol=symbol)
 
     def _get_symbols(self):
@@ -64,7 +65,7 @@ class BiznesControllerStep(BaseStep):
     def process(self):
         self._run_steps_in_this_thread()
 
-        if self.is_done and all(self.step_config.tasks):
+        if self.is_done:
             self._save_last_refresh_time()
 
 
