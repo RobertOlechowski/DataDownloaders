@@ -1,7 +1,7 @@
 # MIX downloader
 
 ## Todo [important]
-- NodeDownloader
+- NodeDownloader   get_latest_block_number    zrobić cache na jakiś czas nie robić request zawsze 
 - Poligon pobierać pliki
 
 

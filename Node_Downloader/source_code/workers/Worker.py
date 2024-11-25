@@ -21,7 +21,7 @@ class Worker(BaseWorker):
         self.node_wrappers = {a.type: a for a in self.node_wrappers}
 
     def init(self):
-        time.sleep(self.local_config.delay_start)
+        time.sleep(self.config.app.worker_delay_start)
 
     def _get_data(self, node_wrapper, block_height):
         json_block = node_wrapper.node.get_block_by_height(block_height=block_height)

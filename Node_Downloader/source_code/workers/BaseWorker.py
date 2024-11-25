@@ -16,7 +16,6 @@ class BaseWorker:
         self.name = f"{name}-{index}"
         self.stop_event = stop_event
         self.config = ConfigLoader().get_data()
-        self.local_config = getattr(self.config, name)
 
         self._was_wait = False
         self._sleep_counter = 1
@@ -51,7 +50,4 @@ class BaseWorker:
     def _wait_sleep(self):
         self._was_wait = True
         sleep_time = self._sleep_counter * self.config.app.sleep_time
-        if self.local_config.sleep_log:
-            print(f"{self.name} is waiting... [{sleep_time:>2} s]")
-
         time.sleep(sleep_time)

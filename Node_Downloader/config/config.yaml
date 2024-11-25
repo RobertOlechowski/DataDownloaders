@@ -4,18 +4,12 @@ app:
   lock_timeout: 5
   config_dump: true
   sleep_time: 1
+  worker_delay_start: 1.5
+  max_queue_size: 300
 
 monitor:
   refresh_time: 1
   observation: 60
-
-id_producer:
-  max_queue_size: 300
-  sleep_log: false
-
-worker:
-  delay_start: 1.5
-  sleep_log: false
 
 redis:
   host: redis

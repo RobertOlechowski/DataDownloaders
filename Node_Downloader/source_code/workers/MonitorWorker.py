@@ -41,7 +41,7 @@ class MonitorWorker(object):
         for item in self.node_wrappers:
             item.process_logs(all_elements)
 
-            latest_block_number = item.node.get_latest_block_number()
+            latest_block_number = item.get_latest_block_number()
 
             msg = [f"[{item.type:>5}]", f"[l:{item.logs_count:>3}]"]
 
