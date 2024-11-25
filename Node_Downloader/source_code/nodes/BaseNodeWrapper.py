@@ -19,7 +19,7 @@ class BaseNodeWrapper:
         self.type = node_config.type
 
         self.generator_position = None
-        self.max_block_height = -1
+        self.max_block_height = None
         self.delta_t = None
         self.blocs_per_hour = None
         self.logs_count = None
@@ -43,6 +43,11 @@ class BaseNodeWrapper:
         if len(elements) > 0:
             self.generator_position = max(elements) + 1
         return elements
+
+    def init_max_block_height(self, minio=None):
+        _ids_in_db = self._get_top_block_height(minio=minio, test_range=1)
+        self.max_block_height = max(_ids_in_db) if len(_ids_in_db) > 0 else 0
+
 
     def gen_missing_ids(self, minio=None, test_range=None):
         _ids_in_db = self._get_top_block_height(minio=minio, test_range=test_range)

@@ -10,6 +10,8 @@ class MonitorWorker(object):
     def __init__(self, config):
         self.config = config
         self.redis = self.config.get_redis()
+        self.minio = self.config.get_minio()
+
         self.app_lock = RedisSingletonLock(self.redis, config.app.lock_timeout)
         self.node_wrappers = BuildNodeWrappers(config)
 
@@ -20,6 +22,9 @@ class MonitorWorker(object):
 
         if self.config.app.config_dump:
             self.config.dump_config()
+
+        for item in self.node_wrappers:
+            item.init_max_block_height(minio=self.minio)
 
     def _get_logs_and_log(self):
         log_records = [pickle.loads(a) for a in self.redis.lrange("log", 0, -1)]
@@ -43,12 +48,9 @@ class MonitorWorker(object):
 
             latest_block_number = item.get_latest_block_number()
 
-            msg = [f"[{item.type:>5}]", f"[l:{item.logs_count:>3}]"]
+            msg = [f"[{item.type:>5}]", f"[l:{item.logs_count:>4}]"]
 
-            if item.max_block_height > -1:
-                msg.append(f"[{(100.0 * item.max_block_height / latest_block_number):>5.2f}%]")
-            else:
-                msg.append(f"[{'??':>5}%]")
+            msg.append(f"[{(100.0 * item.max_block_height / latest_block_number):>6.2f}%]")
 
             msg.append("Δt:")
             msg.append(f"{item.delta_t:>4.1f}" if item.delta_t else "  ??")
