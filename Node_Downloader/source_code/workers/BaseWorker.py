@@ -9,6 +9,10 @@ def get_block_object_name(coin_name, block_height):
         block_group = f"{block_height:08d}"[:4]
         return f"blocks_{block_group}/block_{block_height:08d}.json"
 
+    if coin_name == "eth":
+        block_group = f"{block_height:010d}"[:6]
+        return f"blocks_{block_group}/block_{block_height:010d}.json"
+
     raise Exception("Invalid coin")
 
 class BaseWorker:

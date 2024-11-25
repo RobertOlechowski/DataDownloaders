@@ -24,6 +24,7 @@ minio:
 
 run:
   - btc
+  - eth
 
 tasks:
   btc:
@@ -33,3 +34,32 @@ tasks:
       endpoint: ?????
       user: ?????
       password: ?????
+  eth:
+    type: eth
+    bucket_name: eth
+    node:
+      endpoint: ?????
+    remove_elements:
+      - transactions.receipt.blockHash
+      - transactions.receipt.transactionHash
+      #- logsBloom
+      #- mixHash
+      #- receiptsRoot
+      #- sha3Uncles
+      #- stateRoot
+      #- transactionsRoot
+      #- transactions.blockHash
+      #- transactions.v
+      #- transactions.r
+      #- transactions.s
+      #- transactions.chainId
+      #- transactions.receipt.logsBloom
+      #- transactions.receipt.root
+      #- transactions.receipt.transactionIndex
+      #- transactions.receipt.type
+      #- uncles.logsBloom
+      #- uncles.mixHash
+      #- uncles.receiptsRoot
+      #- uncles.sha3Uncles
+      #- uncles.stateRoot
+      #- uncles.transactionsRoot

@@ -2,7 +2,6 @@
 import pickle
 
 from source_code.nodes.NodeWrapperBuilder import BuildNodeWrappers
-from source_code.nodes.btc.BtcRequestWrapper import BtcRequestWrapper
 from source_code.workers.BaseWorker import BaseWorker
 
 
@@ -17,10 +16,9 @@ class IdProducer(BaseWorker):
     def init(self):
         for item in self.node_wrappers:
             _ids_missing = item.gen_missing_ids(minio=self.minio, test_range=500)
-
-            _ids_missing = [(item.type, a) for a in _ids_missing]
             if len(_ids_missing) > 0:
-                self.redis.rpush("block_ids", *_ids_missing)
+                elements = [(item.type, a) for a in _ids_missing]
+                self.redis.rpush("block_ids", *[pickle.dumps(a) for a in elements])
 
 
     def _gen_ids_mini(self, mini_batch_size):

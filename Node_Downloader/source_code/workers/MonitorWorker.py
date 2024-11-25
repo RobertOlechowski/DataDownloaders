@@ -46,7 +46,7 @@ class MonitorWorker(object):
             msg = [f"[{item.type:>5}]", f"[l:{item.logs_count:>3}]"]
 
             if item.max_block_height > -1:
-                msg.append(f"[{(100.0 * item.max_block_height / latest_block_number):>5.3f}%]")
+                msg.append(f"[{(100.0 * item.max_block_height / latest_block_number):>5.2f}%]")
             else:
                 msg.append(f"[{'??':>5}%]")
 
